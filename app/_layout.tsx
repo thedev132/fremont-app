@@ -42,12 +42,11 @@ export default function RootLayout() {
       screenOptions={{
           headerShown: false
       }}>
-        {/* {loggedIn ? (
+        {loggedIn ? (
             <Stack.Screen name="tabs" component={TabLayout}/>
         ) : (
           <Stack.Screen name="login" component={LoginScreen} />
-        )} */}
-        <Stack.Screen name="tabs" component={TabLayout}/>
+        )}
 
       </Stack.Navigator>
   );
