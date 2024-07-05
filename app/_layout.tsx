@@ -10,8 +10,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import TabLayout from './tabs/_layout';
 import LoginScreen from './login';
 import { createStackNavigator } from '@react-navigation/stack';
-import HomeScreen from './tabs/home';
-import TabTwoScreen from './tabs/explore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -22,20 +21,36 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
+  const [loggedIn, setLoggedIn] = React.useState(false);
 
   const Stack = createStackNavigator();
-
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        await SplashScreen.hideAsync();
+        const value = await AsyncStorage.getItem('loggedIn');
+        if (value === null || value === 'false') {
+          await AsyncStorage.setItem('loggedIn', 'false');
+          setLoggedIn(false);
+        }
+        else if (value === 'true') {
+          setLoggedIn(true);
+        }
+        
+      } catch (e) {
+        // Error handling
+        console.error('Error while loading data:', e);
+      }
+    };
+
     if (loaded) {
-      SplashScreen.hideAsync();
+      loadData();
     }
   }, [loaded]);
 
   if (!loaded) {
     return null;
   }
-
-  const loggedIn = true;
 
   return (
       <Stack.Navigator
@@ -45,7 +60,7 @@ export default function RootLayout() {
         {loggedIn ? (
             <Stack.Screen name="tabs" component={TabLayout}/>
         ) : (
-          <Stack.Screen name="login" component={LoginScreen} />
+          <Stack.Screen name="login" component={() => <LoginScreen loggedIn={loggedIn} setLoggedIn={setLoggedIn} />} />
         )}
 
       </Stack.Navigator>

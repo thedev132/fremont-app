@@ -1,9 +1,11 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import { Image, StatusBar, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Button, Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { SafeAreaFrameContext, SafeAreaView } from 'react-native-safe-area-context';
+import RootLayout from './_layout';
 
-export default function LoginScreen() {
+export default function LoginScreen({loggedIn, setLoggedIn }) {
   return (
     <PaperProvider>
       <SafeAreaView style={{flex:1, backgroundColor: '#1e1e1e'}}>
@@ -24,7 +26,7 @@ export default function LoginScreen() {
                     <Text className='text-white text-xl ml-3 font-bold'>Sign in with Schoology</Text>
                 </View>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => { AsyncStorage.setItem('loggedIn', 'true'); setLoggedIn(true) }}>
                 <View style={{backgroundColor: '#333130', padding: 20, paddingLeft: 35, paddingRight: 64, borderRadius: 15, alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start'}}>
                     <Image source={require('../assets/images/guest.png')}/>
                     <Text className='text-white text-xl ml-3 font-bold'>Continue as Guest</Text>

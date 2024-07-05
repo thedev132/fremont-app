@@ -5,7 +5,7 @@ import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AnimatedTabBarNavigator } from "react-native-animated-nav-tab-bar";
-import HomeScreen from './home';
+import HomeScreen from './schedule';
 import TabTwoScreen from './explore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
