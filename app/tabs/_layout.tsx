@@ -16,42 +16,75 @@ export default function TabLayout() {
   const Tabs = AnimatedTabBarNavigator();
 
   return (
-    <Tabs.Navigator appearance={{floating: true, tabBarBackground: '#3C3C3C'}} tabBarOptions={{activeBackgroundColor: '#BF1B1B', activeTintColor: '#fff'}}>
-      <Tabs.Screen name='schedule' component={HomeScreen} options={{
+    <Tabs.Navigator appearance={{floating: true, tabBarBackground: '#3C3C3C'}} tabBarOptions={{activeBackgroundColor: '#BF1B1B', activeTintColor: '#fff', inactiveTintColor: "#fff"
+    }}>
+      <Tabs.Screen name='Schedule' component={HomeScreen} options={{
         tabBarIcon: ({ focused, color, size }) => (
-            <MaterialCommunityIcons
-                name="clock"
-                size={size ? size : 24}
-                color={focused ? color : "#fff"}
-                focused={focused}
+            focused ? 
+              <MaterialCommunityIcons
+              name="clock"
+              size={ 24}
+              color={color}
+              focused={focused}
+              />
+              : 
+      
+              <MaterialCommunityIcons
+              name="clock-outline"
+              size={24}
+              color={color}
+              focused={focused} />
+        )}} />
+      <Tabs.Screen name='Announcements' component={TabTwoScreen} options={{
+        tabBarIcon: ({ focused, color, size }) => (
+          focused ? 
+            <Ionicons
+            name="notifications"
+            size={24}
+            color={color}
+            focused={focused}
             />
-        )}}/>
-      <Tabs.Screen name='announcements' component={TabTwoScreen} options={{
+            : 
+    
+            <Ionicons
+            name="notifications-outline"
+            size={24}
+            color={color}
+            focused={focused} />
+    )}} />
+      <Tabs.Screen name='ID Card' component={TabTwoScreen} options={{
         tabBarIcon: ({ focused, color, size }) => (
-            <MaterialCommunityIcons
-                name="newspaper-variant-outline"
-                size={size ? size : 24}
-                color={focused ? color : "#fff"}
-                focused={focused}
-            />
-        )}}/>
-      <Tabs.Screen name='id' component={TabTwoScreen} options={{
-        tabBarIcon: ({ focused, color, size }) => (
+          focused ? 
             <FontAwesome
-                name="id-card-o"
-                size={size ? size : 24}
-                color={focused ? color : "#fff"}
-                focused={focused}
+            name="id-card"
+            size={ 24}
+            color={color}
+            focused={focused}
             />
-        )}}/>
-      <Tabs.Screen name='grades' component={TabTwoScreen} options={{
-        tabBarIcon: ({ focused, color, size }) => (
+            : 
+    
             <FontAwesome
-                name="book"
-                size={size ? size : 24}
-                color={focused ? color : "#fff"}
-                focused={focused}
+            name="id-card-o"
+            size={24}
+            color={color}
+            focused={focused} />
+        )}}/>
+      <Tabs.Screen name='Gradebook' component={TabTwoScreen} options={{
+        tabBarIcon: ({ focused, color, size }) => (
+          focused ? 
+            <MaterialCommunityIcons
+            name="school"
+            size={ 24}
+            color={color}
+            focused={focused}
             />
+            : 
+    
+            <MaterialCommunityIcons
+            name="school-outline"
+            size={24}
+            color={color}
+            focused={focused} />
         )}}/>
 
     </Tabs.Navigator>
