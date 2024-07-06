@@ -8,8 +8,30 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCallback, useEffect, useState } from 'react';
 import InfiniteCampus from '@/constants/InfiniteCampus';
 import Course from '@/constants/InfiniteCampusCourse';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default  function ScheduleScreen() {
+
+  const [uniqueCourses, setUniqueCourses] = useState<Course[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log('fetching data')
+        let courses = await getCourses();
+        console.log('courses fetced', courses)
+        setUniqueCourses(courses);
+        // Process courses
+        // Set state
+      } catch (error) {
+        // Handle error
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
+
   const duration = 250;
   
   let date = new Date()
@@ -43,20 +65,41 @@ export default  function ScheduleScreen() {
       if (timeA < timeB) return -1;
       if (timeA > timeB) return 1;
       return 0;
-  });
-  return uniqueCourses;
+    });
+    return uniqueCourses;
   };
   
-  const [uniqueCourses, setUniqueCourses] = useState<Course[]>([]);
+function formatTime(timeString) {
+    // Create a Date object with an arbitrary date to parse the time
 
-useEffect(() => {
-  const fetchCourses = async () => {
-    let courses = await getCourses();
-    setUniqueCourses(courses); // Assuming you have a state variable and setter for uniqueCourses
-  };
+    if (timeString == undefined) {
+      return
+    }
 
-  fetchCourses();
-}, []);
+    let time = new Date('2000-01-01T' + timeString);
+    
+    // Extract hours and minutes
+    let hours = time.getHours();
+    let minutes = time.getMinutes();
+    
+    // Determine if it's AM or PM
+    let period = hours >= 12 ? 'pm' : 'am';
+    
+    // Convert hours from 24-hour to 12-hour format
+    hours = hours % 12;
+    hours = hours ? hours : 12; // Handle midnight case (0 hours)
+    
+    // Format minutes with leading zero if necessary
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    
+    // Construct the formatted time string
+    let formattedTime = hours + ':' + minutes + period;
+    
+    return formattedTime;
+}
+
+
+
   return (
       <View style={{backgroundColor: '#1e1e1e', height: '100%', flex: 1, alignItems: 'center'}}>
             <SafeAreaView style={{marginTop: 50}}>
@@ -76,14 +119,27 @@ useEffect(() => {
             </CountdownCircleTimer>
             <Text style={{color: '#fff'}}>Today's Schedule</Text>
 
+        <ScrollView style={{width: '100%', marginBottom: 20}}>
         {
           uniqueCourses.map(course => (
-            <View style={{backgroundColor: '#1e1e1e', height: '100%', flex: 1, alignItems: 'center'}}>
+            <View style={{backgroundColor: '#8a8a8a', alignItems: 'flex-start', padding: 20, borderRadius: 15, margin: 10}}>
               <Text style={{color: '#fff'}}>{course.getName()}</Text>
-              <Text style={{color: '#fff'}}>{course.getTeacherName()}</Text>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+
+                {course.getStartTime() != undefined && course.getEndTime() != undefined && (
+                  <Text style={{color: '#fff'}}>{formatTime(course.getStartTime())}-{formatTime(course.getEndTime())} </Text>
+                )}
+                <Text style={{color: '#fff'}}>{course.getTeacherName().replace(/,/g, '').trim().split(/\s+/)[0]}</Text>
+                
+                {course.getRoom() != undefined && (
+                  <Text style={{color: '#fff'}}> • RM: {course.getRoom()}</Text>
+                )}
+              </View>
             </View>
           ))
+          
         }
+        </ScrollView>
           </SafeAreaView>
       </View>
 

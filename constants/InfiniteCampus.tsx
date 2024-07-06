@@ -47,22 +47,21 @@ export default class InfiniteCampus {
     public async getSchedule(date: Date | string) {
         
         try {
-
             let courses = new Array<Course>();
+            console.log('doing the fetch')
 
             const response = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_date=${date}`, {
               method: 'GET',
-              credentials: 'include'
             });
+            console.log('halfway')
 
             let data = await response.json();
             let calendarID = data[0]['calendarID']
 
             const responseDay = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/calendar/instructionalDay?calendarID=${calendarID}&date=${date}`, {
                 method: 'GET',
-                credentials: 'include'
             });
-
+            console.log('did the fetch')
             let dataForDay = await responseDay.json();
             let todayPeriodScheduleID = dataForDay[0]['periodScheduleID']
 
@@ -81,7 +80,7 @@ export default class InfiniteCampus {
         }
             return courses;
           } catch (err) {
-            return 'Promise.reject(err);'
+            return Promise.reject(err);
           }
     }
 
