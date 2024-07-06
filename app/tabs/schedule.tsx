@@ -7,8 +7,9 @@ import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCallback, useEffect, useState } from 'react';
 import InfiniteCampus from '@/constants/InfiniteCampus';
+import Course from '@/constants/InfiniteCampusCourse';
 
-export default function ScheduleScreen() {
+export default  function ScheduleScreen() {
   const duration = 250;
   
   let date = new Date()
@@ -18,10 +19,44 @@ export default function ScheduleScreen() {
 
   let user = new InfiniteCampus('mmortada201', 'Thedevcookie1')
   user.login()
-  user.getSchedule('2024-04-11')
+  const getCourses = async () => {
+    let courses = await user.getSchedule('2024-04-12');
+    let uniqueCourses: Course[] = [];
+    let courseMap: { [key: string]: boolean } = {};
+    
+    for (let course of courses) {
+      if (course instanceof Course) {
+        let courseName = course.getName();
+        if (courseName && !courseMap[courseName]) {
+          courseMap[courseName] = true;
+          uniqueCourses.push(course);
+        }
+      }
+    }
 
+    uniqueCourses.sort((a, b) => {
+      // Assuming `time` is a property of the Course object
+      let timeA = a.getStartTime();
+      let timeB = b.getStartTime();
+      
+      // Compare times (assuming time is in format 'HH:MM')
+      if (timeA < timeB) return -1;
+      if (timeA > timeB) return 1;
+      return 0;
+  });
+  return uniqueCourses;
+  };
+  
+  const [uniqueCourses, setUniqueCourses] = useState<Course[]>([]);
 
+useEffect(() => {
+  const fetchCourses = async () => {
+    let courses = await getCourses();
+    setUniqueCourses(courses); // Assuming you have a state variable and setter for uniqueCourses
+  };
 
+  fetchCourses();
+}, []);
   return (
       <View style={{backgroundColor: '#1e1e1e', height: '100%', flex: 1, alignItems: 'center'}}>
             <SafeAreaView style={{marginTop: 50}}>
@@ -39,7 +74,20 @@ export default function ScheduleScreen() {
             >
               {({ remainingTime }) => <Text>{remainingTime}</Text>}
             </CountdownCircleTimer>
+            <Text style={{color: '#fff'}}>Today's Schedule</Text>
+
+        {
+          uniqueCourses.map(course => (
+            <View style={{backgroundColor: '#1e1e1e', height: '100%', flex: 1, alignItems: 'center'}}>
+              <Text style={{color: '#fff'}}>{course.getName()}</Text>
+              <Text style={{color: '#fff'}}>{course.getTeacherName()}</Text>
+            </View>
+          ))
+        }
           </SafeAreaView>
       </View>
+
+      
+
   );
 }
