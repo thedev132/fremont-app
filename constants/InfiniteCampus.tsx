@@ -122,7 +122,7 @@ export default class InfiniteCampus {
           fileReaderInstance.readAsDataURL(blob); 
           fileReaderInstance.onload = () => {
               let base64data = fileReaderInstance.result;                
-              console.log(base64data);
+              return (base64data as string).replace("data:application/octet-stream;base64,", "");
  }
           
         } catch (err) {

@@ -7,16 +7,29 @@ import Course from '@/constants/InfiniteCampusCourse';
 import { ScrollView } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
 import formatTime from '@/constants/FormatTime';
-
+import ClassCountdown from '@/components/CountDownTimer';
 export default  function ScheduleScreen() {
 
   const [uniqueCourses, setUniqueCourses] = useState<Course[]>([]);
+  const [classTimes, setClassTimes] = useState<{ classes: { start: string; end: string; }[] }>({ classes: [] });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         let courses = await getCourses();
         setUniqueCourses(courses);
+
+        let classTimes: { classes: { start: string; end: string; }[] } = {
+          "classes": []
+        }
+        for (let course of courses) {
+          let startTime = course.getStartTime();
+          let endTime = course.getEndTime();
+          if (startTime && endTime) {
+            classTimes.classes.push({ "start": startTime, "end": endTime });
+          }
+        }
+        setClassTimes(classTimes);
       } catch (error) {
         // Handle error
       }
@@ -73,19 +86,7 @@ export default  function ScheduleScreen() {
       <View style={{alignItems: 'center'}}>
        <SafeAreaView style={{marginTop: 30, width: '100%', alignItems: 'center'}}>
         <View style={{marginBottom: 10}}>  
-            <CountdownCircleTimer
-            
-              isPlaying
-              duration={duration}
-              colors={['#fc0303', '#0324fc']}
-              colorsTime={[duration, 0]}
-              size={250}
-              strokeWidth={16}
-              trailStrokeWidth={15}
-              trailColor='#fff'
-            >
-              {({ remainingTime }) => <Text>{remainingTime}</Text>}
-            </CountdownCircleTimer>
+            <ClassCountdown time={classTimes} />
         </View>  
 
         <ScrollView showsVerticalScrollIndicator={false}  style={{width: '100%', marginBottom: 100}}>
