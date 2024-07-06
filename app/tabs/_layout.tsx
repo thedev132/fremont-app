@@ -16,7 +16,7 @@ export default function TabLayout() {
   const Tabs = AnimatedTabBarNavigator();
 
   return (
-    <Tabs.Navigator appearance={{floating: true, tabBarBackground: '#3C3C3C'}} tabBarOptions={{activeBackgroundColor: '#BF1B1B', activeTintColor: '#fff', inactiveTintColor: "#fff"
+    <Tabs.Navigator appearance={{floating: true, tabBarBackground: '#fff'}} tabBarOptions={{activeBackgroundColor: '#BF1B1B', activeTintColor: '#fff', inactiveTintColor: "#fff"
     }}>
       <Tabs.Screen name='Schedule' component={HomeScreen} options={{
         tabBarIcon: ({ focused, color, size }) => (
@@ -32,7 +32,7 @@ export default function TabLayout() {
               <MaterialCommunityIcons
               name="clock-outline"
               size={24}
-              color={color}
+              color={'black'}
               focused={focused} />
         )}} />
       <Tabs.Screen name='Announcements' component={TabTwoScreen} options={{
@@ -49,7 +49,7 @@ export default function TabLayout() {
             <Ionicons
             name="notifications-outline"
             size={24}
-            color={color}
+            color={'black'}
             focused={focused} />
     )}} />
       <Tabs.Screen name='ID Card' component={TabTwoScreen} options={{
@@ -66,7 +66,7 @@ export default function TabLayout() {
             <FontAwesome
             name="id-card-o"
             size={24}
-            color={color}
+            color={'black'}
             focused={focused} />
         )}}/>
       <Tabs.Screen name='Gradebook' component={TabTwoScreen} options={{
@@ -83,7 +83,7 @@ export default function TabLayout() {
             <MaterialCommunityIcons
             name="school-outline"
             size={24}
-            color={color}
+            color={'black'}
             focused={focused} />
         )}}/>
 

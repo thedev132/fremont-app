@@ -48,12 +48,10 @@ export default class InfiniteCampus {
         
         try {
             let courses = new Array<Course>();
-            console.log('doing the fetch')
 
             const response = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_date=${date}`, {
               method: 'GET',
             });
-            console.log('halfway')
 
             let data = await response.json();
             let calendarID = data[0]['calendarID']
@@ -61,7 +59,6 @@ export default class InfiniteCampus {
             const responseDay = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/calendar/instructionalDay?calendarID=${calendarID}&date=${date}`, {
                 method: 'GET',
             });
-            console.log('did the fetch')
             let dataForDay = await responseDay.json();
             let todayPeriodScheduleID = dataForDay[0]['periodScheduleID']
 
@@ -84,5 +81,53 @@ export default class InfiniteCampus {
           }
     }
 
-}
+    public async getIDNumber() {
+      try {
+          const response = await fetch(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, {
+            method: 'GET',
+          });
 
+          let data = await response.json();
+          let IDNumber =  data[0]['studentNumber'];
+          return IDNumber;
+
+        } catch (err) {
+          return Promise.reject(err);
+        }
+    }
+
+    public async getPersonID() {
+      try {
+          const response = await fetch(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, {
+            method: 'GET',
+          });
+
+          let data = await response.json();
+          let studentID =  data[0]['personID'];
+          return studentID;
+
+        } catch (err) {
+          return Promise.reject(err);
+      }
+    }
+
+    public async getProfilePicture() {
+      //https://fuhsd.infinitecampus.org/campus/personPicture.jsp?personID=231994&alt=teacherApp&img=large
+      try {
+          const response = await fetch(`https://fuhsd.infinitecampus.org/campus/personPicture.jsp?personID=${await this.getPersonID()}&alt=teacherApp&img=large`, {
+            method: 'GET',
+          });
+          let blob = await response.blob();
+          const fileReaderInstance = new FileReader();
+          fileReaderInstance.readAsDataURL(blob); 
+          fileReaderInstance.onload = () => {
+              let base64data = fileReaderInstance.result;                
+              console.log(base64data);
+ }
+          
+        } catch (err) {
+          return Promise.reject(err);
+        }
+    }
+
+}
