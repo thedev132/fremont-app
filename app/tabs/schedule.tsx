@@ -22,6 +22,7 @@ export default  function ScheduleScreen() {
     const fetchData = async () => {
       try {
         
+        
         let courses = await getCourses();
         setUniqueCourses(courses);
 
