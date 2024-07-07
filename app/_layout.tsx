@@ -56,11 +56,12 @@ export default function RootLayout() {
       <Stack.Navigator
       screenOptions={{
           headerShown: false
+          
       }}>
         {loggedIn ? (
             <Stack.Screen name="tabs" component={TabLayout}/>
         ) : (
-          <Stack.Screen name="login" component={() => <LoginScreen loggedIn={loggedIn} setLoggedIn={setLoggedIn} />} />
+          <Stack.Screen name="login" children={() => <LoginScreen loggedIn={loggedIn} setLoggedIn={setLoggedIn} />} />
         )}
 
       </Stack.Navigator>

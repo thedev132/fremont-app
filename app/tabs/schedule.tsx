@@ -8,14 +8,20 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
 import formatTime from '@/constants/FormatTime';
 import ClassCountdown from '@/components/CountDownTimer';
+
 export default  function ScheduleScreen() {
+
 
   const [uniqueCourses, setUniqueCourses] = useState<Course[]>([]);
   const [classTimes, setClassTimes] = useState<{ classes: { start: string; end: string; }[] }>({ classes: [] });
 
+
+  let user = new InfiniteCampus('mmortada201', 'Thedevcookie1')
+  user.login()
   useEffect(() => {
     const fetchData = async () => {
       try {
+        
         let courses = await getCourses();
         setUniqueCourses(courses);
 
@@ -37,7 +43,7 @@ export default  function ScheduleScreen() {
   
     fetchData();
   }, []);
-  
+
 
   const duration = 250;
   
@@ -46,8 +52,6 @@ export default  function ScheduleScreen() {
   date = new Date(date.getTime() - (offset*60*1000))
   let formattedDate = date.toISOString().split('T')[0]
 
-  let user = new InfiniteCampus('username', 'password')
-  user.login()
   const getCourses = async () => {
     let courses = await user.getSchedule('2024-04-12');
     let uniqueCourses: Course[] = [];
@@ -75,14 +79,13 @@ export default  function ScheduleScreen() {
     });
     return uniqueCourses;
   };
-  user.getProfilePicture()
   
 
 
 
   return (
     // create a linear gradient with '#ee0808', '#1602ee'
-    <LinearGradient colors={['#1602ee',"#ad10f4", '#ee0808']} style={{flex: 1}}>
+    <LinearGradient colors={['#12264d', '#2c77d8']} style={{flex: 1}}>
       <View style={{alignItems: 'center'}}>
        <SafeAreaView style={{marginTop: 30, width: '100%', alignItems: 'center'}}>
         <View style={{marginBottom: 10}}>  

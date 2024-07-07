@@ -62,6 +62,7 @@ const getCurrentTime = () => {
         setRemainingTime(remainingTime);
         setIsClassOngoing(isClassOngoing);
         setElapsedTime(elapsedTime);
+        setTotalClassDuration(totalClassDuration);
       }, 1000); // Update every second
   
       return () => clearInterval(interval);
@@ -78,7 +79,7 @@ const getCurrentTime = () => {
         size={250}
         strokeWidth={16}
         trailStrokeWidth={15}
-        trailColor="#fff"
+        trailColor="rgba(255, 255, 255, 0.3)"
         
       >
         {() => (

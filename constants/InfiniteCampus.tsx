@@ -1,6 +1,9 @@
 import React from 'react';
 import Course
  from './InfiniteCampusCourse';
+
+import Student from './InfiniteCampusStudent';
+
 export default class InfiniteCampus {
     public name: string | undefined;
     public password: string | undefined;
@@ -96,36 +99,56 @@ export default class InfiniteCampus {
         }
     }
 
-    public async getPersonID() {
+    public async getStudentInfo() {
       try {
           const response = await fetch(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, {
             method: 'GET',
           });
-
           let data = await response.json();
-          let studentID =  data[0]['personID'];
-          return studentID;
+          let personID =  data[0]['personID'];
+          let profilePicture = await this.getProfilePicture(personID) ?? ''
+          let studentID = data[0]['studentNumber'];
+          let firstName = data[0]['firstName'];
+
+          let lastName = data[0]['lastName'];
+          let grade = data[0]['enrollments'][0]['grade'];
+          let student = new Student(firstName, lastName, grade, studentID, profilePicture);
+          return student;
 
         } catch (err) {
+          console.log('error');
           return Promise.reject(err);
       }
     }
 
-    public async getProfilePicture() {
-      //https://fuhsd.infinitecampus.org/campus/personPicture.jsp?personID=231994&alt=teacherApp&img=large
+    public async getProfilePicture(personID: string) {
       try {
-          const response = await fetch(`https://fuhsd.infinitecampus.org/campus/personPicture.jsp?personID=${await this.getPersonID()}&alt=teacherApp&img=large`, {
+          const response = await fetch(`https://fuhsd.infinitecampus.org/campus/personPicture.jsp?personID=${personID}&alt=teacherApp&img=large`, {
             method: 'GET',
           });
           let blob = await response.blob();
           const fileReaderInstance = new FileReader();
-          fileReaderInstance.readAsDataURL(blob); 
-          fileReaderInstance.onload = () => {
-              let base64data = fileReaderInstance.result;                
-              return (base64data as string).replace("data:application/octet-stream;base64,", "");
- }
+
+          return new Promise((resolve, reject) => {
+              // Start reading the blob as a data URL
+              fileReaderInstance.readAsDataURL(blob);
+  
+              // On successful load, resolve the promise with the base64 data
+              fileReaderInstance.onload = () => {
+                  let base64data = fileReaderInstance.result as string;
+                  // Remove the unnecessary prefix from the base64 data
+                  let data = base64data.replace("data:application/octet-stream;base64,", "");
+                  resolve(data);
+              };
+  
+              // On error, reject the promise
+              fileReaderInstance.onerror = (error) => {
+                  reject(error);
+              };
+            });
           
         } catch (err) {
+          console.log('error');
           return Promise.reject(err);
         }
     }

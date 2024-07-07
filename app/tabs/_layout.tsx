@@ -11,14 +11,17 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
+import InfiniteCampus from '@/constants/InfiniteCampus';
+import IDCardScreen from './idCard';
+import ScheduleScreen from './schedule';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const Tabs = AnimatedTabBarNavigator();
 
   return (
-    <Tabs.Navigator appearance={{floating: true, tabBarBackground: '#fff'}} tabBarOptions={{activeBackgroundColor: '#BF1B1B', activeTintColor: '#fff', inactiveTintColor: "#fff"
+    <Tabs.Navigator appearance={{floating: true, tabBarBackground: 'rgba(255, 255, 255, 0.8)'}} tabBarOptions={{activeBackgroundColor: '#BF1B1B', activeTintColor: '#fff', inactiveTintColor: "#fff"
     }}>
-      <Tabs.Screen name='Schedule' component={HomeScreen} options={{
+      <Tabs.Screen name='Schedule' children={ScheduleScreen} options={{
         tabBarIcon: ({ focused, color, size }) => (
             focused ? 
               <MaterialCommunityIcons
@@ -52,7 +55,7 @@ export default function TabLayout() {
             color={'black'}
             focused={focused} />
     )}} />
-      <Tabs.Screen name='ID Card' component={TabTwoScreen} options={{
+      <Tabs.Screen name='ID Card'  children={IDCardScreen} options={{
         tabBarIcon: ({ focused, color, size }) => (
           focused ? 
             <FontAwesome
