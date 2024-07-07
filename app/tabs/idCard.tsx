@@ -3,7 +3,7 @@ import Student from '@/constants/InfiniteCampusStudent';
 import { useEffect, useState } from 'react';
 import { Text, View, Image } from 'react-native';
 export default function IDCardScreen() {
-    let user = new InfiniteCampus('mmortada201', 'Thedevcookie1')
+    let user = new InfiniteCampus('username', 'password')
     user.login()
     
     const [studentInfo, setStudentInfo] = useState<Student>();

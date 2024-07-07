@@ -16,7 +16,7 @@ export default  function ScheduleScreen() {
   const [classTimes, setClassTimes] = useState<{ classes: { start: string; end: string; }[] }>({ classes: [] });
 
 
-  let user = new InfiniteCampus('mmortada201', 'Thedevcookie1')
+  let user = new InfiniteCampus('username', 'password')
   user.login()
   useEffect(() => {
     const fetchData = async () => {
