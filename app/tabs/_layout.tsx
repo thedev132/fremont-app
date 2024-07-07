@@ -21,7 +21,7 @@ export default function TabLayout() {
   return (
     <Tabs.Navigator appearance={{floating: true, tabBarBackground: 'rgba(255, 255, 255, 0.8)'}} tabBarOptions={{activeBackgroundColor: '#BF1B1B', activeTintColor: '#fff', inactiveTintColor: "#fff"
     }}>
-      <Tabs.Screen name='Schedule' children={ScheduleScreen} options={{
+      <Tabs.Screen name='Schedule' component={ScheduleScreen} options={{
         tabBarIcon: ({ focused, color, size }) => (
             focused ? 
               <MaterialCommunityIcons
@@ -55,7 +55,7 @@ export default function TabLayout() {
             color={'black'}
             focused={focused} />
     )}} />
-      <Tabs.Screen name='ID Card'  children={IDCardScreen} options={{
+      <Tabs.Screen name='ID Card'  component={IDCardScreen} options={{
         tabBarIcon: ({ focused, color, size }) => (
           focused ? 
             <FontAwesome

@@ -51,17 +51,16 @@ export default class InfiniteCampus {
         
         try {
             let courses = new Array<Course>();
-
             const response = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_date=${date}`, {
               method: 'GET',
             });
-
             let data = await response.json();
             let calendarID = data[0]['calendarID']
 
             const responseDay = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/calendar/instructionalDay?calendarID=${calendarID}&date=${date}`, {
                 method: 'GET',
             });
+
             let dataForDay = await responseDay.json();
             let todayPeriodScheduleID = dataForDay[0]['periodScheduleID']
 
@@ -78,8 +77,10 @@ export default class InfiniteCampus {
                 }
             }
         }
+
             return courses;
           } catch (err) {
+            console.log('error2');
             return Promise.reject(err);
           }
     }
@@ -136,9 +137,7 @@ export default class InfiniteCampus {
               // On successful load, resolve the promise with the base64 data
               fileReaderInstance.onload = () => {
                   let base64data = fileReaderInstance.result as string;
-                  // Remove the unnecessary prefix from the base64 data
-                  let data = base64data.replace("data:application/octet-stream;base64,", "");
-                  resolve(data);
+                  resolve(base64data);
               };
   
               // On error, reject the promise
