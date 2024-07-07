@@ -67,13 +67,12 @@ const getCurrentTime = () => {
   
       return () => clearInterval(interval);
     }, [time]);
-  
+    
     return (
       <CountdownCircleTimer
-        isPlaying
-        
-        duration={isClassOngoing ? totalClassDuration : 0} // duration in seconds
-        initialRemainingTime={isClassOngoing ? totalClassDuration - elapsedTime : remainingTime} // elapsed time in seconds
+        isPlaying = {isClassOngoing}
+        duration={totalClassDuration} // duration in seconds
+        initialRemainingTime={isClassOngoing ? totalClassDuration - elapsedTime : 2000} // elapsed time in seconds
         colors={['#fc0303', '#0324fc']}
         colorsTime={[totalClassDuration, 0]}
         size={250}

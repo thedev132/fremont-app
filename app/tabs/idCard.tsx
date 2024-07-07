@@ -3,8 +3,10 @@ import Student from '@/constants/InfiniteCampusStudent';
 import { useEffect, useState } from 'react';
 import { Text, View, Image } from 'react-native';
 import { Divider } from 'react-native-paper';
+import Barcode from '@adrianso/react-native-barcode-builder';
+
 export default function IDCardScreen() {
-    let user = new InfiniteCampus('mmortada201', 'Thedevcookie1')
+    let user = new InfiniteCampus('', '')
     user.login()
     
     const [studentInfo, setStudentInfo] = useState<Student>();
@@ -27,6 +29,7 @@ export default function IDCardScreen() {
             <Text style={{color: 'black'}}> {studentInfo?.getFullName()} </Text>
             <Divider />
             <Text style={{color: 'black'}}>Grade: {studentInfo?.getGrade().charAt(0) === '0' ? studentInfo?.getGrade()?.slice(1) : studentInfo?.getGrade()} | Student</Text>
+
             
   
             

@@ -1,20 +1,18 @@
-import { Image, StyleSheet, Platform, View, Text } from 'react-native';
-import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useCallback, useEffect, useState } from 'react';
 import InfiniteCampus from '@/constants/InfiniteCampus';
 import Course from '@/constants/InfiniteCampusCourse';
-import { ScrollView } from 'react-native-gesture-handler';
-import { LinearGradient } from 'expo-linear-gradient';
-import formatTime from '@/constants/FormatTime';
 import ClassCountdown from '@/components/CountDownTimer';
+import formatTime from '@/constants/FormatTime';
 
 export default function ScheduleScreen() {
-
   const [uniqueCourses, setUniqueCourses] = useState([]);
   const [classTimes, setClassTimes] = useState({ classes: [] });
+  const [loading, setLoading] = useState(true); // Loading state
 
-  let user = new InfiniteCampus('mmortada201', 'Thedevcookie1');
+  let user = new InfiniteCampus('', '');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,7 +21,7 @@ export default function ScheduleScreen() {
         let courses = await getCourses();
         setUniqueCourses(courses);
 
-        let newClassTimes: { classes: { start: string; end: string; }[] } = { classes: [] };
+        let newClassTimes = { classes: [] };
         for (let course of courses) {
           let startTime = course.getStartTime();
           let endTime = course.getEndTime();
@@ -32,9 +30,11 @@ export default function ScheduleScreen() {
           }
         }
         setClassTimes(newClassTimes);
-        
+        setLoading(false); 
+
       } catch (error) {
         console.error('Error fetching data:', error);
+        setLoading(false); // Ensure loading is set to false on error
       }
     };
 
@@ -44,9 +44,9 @@ export default function ScheduleScreen() {
   const getCourses = async () => {
     try {
       let courses = await user.getSchedule('2024-04-12');
-      let uniqueCourses: Course[] = [];
-      let courseMap: { [key: string]: boolean } = {};
-      
+      let uniqueCourses = [];
+      let courseMap = {};
+
       for (let course of courses) {
         if (course instanceof Course) {
           let courseName = course.getName();
@@ -71,13 +71,21 @@ export default function ScheduleScreen() {
     }
   };
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
+  }
+
   return (
     <LinearGradient colors={['#12264d', '#2c77d8']} style={{ flex: 1 }}>
       <View style={{ alignItems: 'center' }}>
         <SafeAreaView style={{ marginTop: 30, width: '100%', alignItems: 'center' }}>
-          <View style={{ marginBottom: 10 }}>  
+          <View style={{ marginBottom: 10 }}>
             <ClassCountdown time={classTimes} />
-          </View>  
+          </View>
           <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%', marginBottom: 100 }}>
             {uniqueCourses.map((course, index) => (
               <View key={index} style={{ backgroundColor: 'rgba(13, 30, 115, 0.5)', alignItems: 'flex-start', padding: 20, borderRadius: 15, margin: 6, marginHorizontal: 40 }}>
