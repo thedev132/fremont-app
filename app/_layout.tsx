@@ -18,11 +18,11 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
 
   const [loggedIn, setLoggedIn] = React.useState(false);
+  const [IF, setIF] = React.useState(false);
+  const [appIsReady, setAppIsReady] = React.useState(false);
+
 
   const Stack = createStackNavigator();
   useEffect(() => {
@@ -30,6 +30,13 @@ export default function RootLayout() {
       try {
         await SplashScreen.hideAsync();
         const value = await AsyncStorage.getItem('loggedIn');
+        const IF = await AsyncStorage.getItem('IF');
+        if (IF === 'true') {
+          setIF(true);
+        }
+        else if (IF === 'false') {
+          setIF(false);
+        }
         if (value === null || value === 'false') {
           await AsyncStorage.setItem('loggedIn', 'false');
           setLoggedIn(false);
@@ -42,29 +49,51 @@ export default function RootLayout() {
         // Error handling
         console.error('Error while loading data:', e);
       }
+      finally {
+        // Tell the application to render
+        setAppIsReady(true);
+      }
     };
+    loadData();
 
-    if (loaded) {
-      loadData();
+
+  }, []);
+
+  const onLayoutRootView = React.useCallback(async () => {
+    if (appIsReady) {
+      // This tells the splash screen to hide immediately! If we call this after
+      // `setAppIsReady`, then we may see a blank screen while the app is
+      // loading its initial state and rendering its first pixels. So instead,
+      // we hide the splash screen once we know the root view has already
+      // performed layout.
+      await SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [appIsReady]);
 
-  if (!loaded) {
+  if (!appIsReady) {
     return null;
   }
 
   return (
       <Stack.Navigator
-      screenOptions={{
+        screenOptions={{
           headerShown: false
-          
-      }}>
-        {/* {loggedIn ? (
-            <Stack.Screen name="tabs" component={TabLayout}/>
+        }}>
+       {loggedIn ? (
+          IF ? (
+            <Stack.Screen name="tabs" component={TabLayout} />
+          ) : (
+            <Stack.Screen
+              name="ConnectInfiniteCampus"
+              children={() => <ConnectIFScreen IF={IF} setIF={setIF} />}
+            />
+          )
         ) : (
-          <Stack.Screen name="login" children={() => <LoginScreen loggedIn={loggedIn} setLoggedIn={setLoggedIn} />} />
-        )} */}
-        <Stack.Screen name="ConnectInfiniteCampus" component={ConnectIFScreen}/>
+          <Stack.Screen
+            name="login"
+            children={() => <LoginScreen loggedIn={loggedIn} setLoggedIn={setLoggedIn} />}
+          />
+        )}
 
       </Stack.Navigator>
   );

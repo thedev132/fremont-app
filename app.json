@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.fhs.fremontapp"
+      "bundleIdentifier": "org.fuhsd.fhs.app"
     },
     "android": {
       "adaptiveIcon": {

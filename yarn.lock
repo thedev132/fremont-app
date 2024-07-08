@@ -8358,6 +8358,11 @@ react-native-countdown-circle-timer@^3.2.1:
   resolved "https://registry.npmjs.org/react-native-countdown-circle-timer/-/react-native-countdown-circle-timer-3.2.1.tgz"
   integrity sha512-iHiOgipG0hMprerswqUCUfjGo9hL0UhKNS0BGh4o6yY9Lu7f3VXQ7EJt757Obwn74AiF5MOHURIdqldoGnVrDw==
 
+react-native-encrypted-storage@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.npmjs.org/react-native-encrypted-storage/-/react-native-encrypted-storage-4.0.3.tgz"
+  integrity sha512-0pJA4Aj2S1PIJEbU7pN/Qvf7JIJx3hFywx+i+bLHtgK0/6Zryf1V2xVsWcrD50dfiu3jY1eN2gesQ5osGxE7jA==
+
 "react-native-gesture-handler@>= 1.0.0", react-native-gesture-handler@~2.16.1:
   version "2.16.2"
   resolved "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.16.2.tgz"

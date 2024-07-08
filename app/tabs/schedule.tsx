@@ -6,19 +6,23 @@ import InfiniteCampus from '@/constants/InfiniteCampus';
 import Course from '@/constants/InfiniteCampusCourse';
 import ClassCountdown from '@/components/CountDownTimer';
 import formatTime from '@/constants/FormatTime';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 export default function ScheduleScreen() {
   const [uniqueCourses, setUniqueCourses] = useState([]);
   const [classTimes, setClassTimes] = useState({ classes: [] });
   const [loading, setLoading] = useState(true); // Loading state
 
-  let user = new InfiniteCampus('', '');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        let username = await AsyncStorage.getItem('IFUsername');
+        let password = await EncryptedStorage.getItem('IFPassword');
+        let user = new InfiniteCampus(username, password);
         await user.login();
-        let courses = await getCourses();
+        let courses = await getCourses(user);
         setUniqueCourses(courses);
 
         let newClassTimes = { classes: [] };
@@ -41,7 +45,7 @@ export default function ScheduleScreen() {
     fetchData();
   }, []);
 
-  const getCourses = async () => {
+  const getCourses = async (user) => {
     try {
       let courses = await user.getSchedule('2024-04-12');
       let uniqueCourses = [];

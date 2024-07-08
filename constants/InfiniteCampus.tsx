@@ -29,21 +29,21 @@ export default class InfiniteCampus {
     }
 
     // WORK IN PROGRESS
-    // public async getGrades() {
-    //     try {
-    //         const response = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/portal/grades`, {
-    //           method: 'GET',
-    //           credentials: 'include'
-    //         });
+    public async getGrades() {
+        try {
+            const response = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/portal/grades`, {
+              method: 'GET',
+              credentials: 'include'
+            });
 
-    //         let data = await response.json();
-    //         console.log(data);
+            let data = await response.json();
+            console.log(data);
         
-    //         return Promise.resolve();
-    //       } catch (err) {
-    //         return Promise.reject(err);
-    //       }
-    // }
+            return Promise.resolve();
+          } catch (err) {
+            return Promise.reject(err);
+          }
+    }
     // https://fuhsd.infinitecampus.org/campus/resources/calendar/instructionalDay?calendarID=640
 
 

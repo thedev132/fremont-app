@@ -4,15 +4,21 @@ import { useEffect, useState } from 'react';
 import { Text, View, Image, StyleSheet } from 'react-native';
 import { BarcodeCreatorView, BarcodeFormat } from "react-native-barcode-creator";
 import Divider from '@/components/Divider';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 
 export default function IDCardScreen() {
-    let user = new InfiniteCampus('', '');
-    user.login()
+
     
     const [studentInfo, setStudentInfo] = useState<Student>();
     useEffect(() => {
+
         const fetchData = async () => {
+            let username = await AsyncStorage.getItem('IFUsername');
+            let password = await EncryptedStorage.getItem('IFPassword');
+            let user = new InfiniteCampus(username, password);
+            user.login();
             try {
                 let student = await user.getStudentInfo();
                 setStudentInfo(student);
