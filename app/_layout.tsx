@@ -11,6 +11,7 @@ import TabLayout from './tabs/_layout';
 import LoginScreen from './login';
 import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ConnectIFScreen from './ConnectInfiniteCampus';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -58,11 +59,12 @@ export default function RootLayout() {
           headerShown: false
           
       }}>
-        {loggedIn ? (
+        {/* {loggedIn ? (
             <Stack.Screen name="tabs" component={TabLayout}/>
         ) : (
           <Stack.Screen name="login" children={() => <LoginScreen loggedIn={loggedIn} setLoggedIn={setLoggedIn} />} />
-        )}
+        )} */}
+        <Stack.Screen name="ConnectInfiniteCampus" component={ConnectIFScreen}/>
 
       </Stack.Navigator>
   );

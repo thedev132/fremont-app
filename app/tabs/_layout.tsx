@@ -5,15 +5,13 @@ import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AnimatedTabBarNavigator } from "react-native-animated-nav-tab-bar";
-import HomeScreen from './schedule';
 import TabTwoScreen from './explore';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
-import InfiniteCampus from '@/constants/InfiniteCampus';
 import IDCardScreen from './idCard';
 import ScheduleScreen from './schedule';
+import GradesScreen from './grades';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const Tabs = AnimatedTabBarNavigator();
@@ -72,7 +70,7 @@ export default function TabLayout() {
             color={'black'}
             focused={focused} />
         )}}/>
-      <Tabs.Screen name='Gradebook' component={TabTwoScreen} options={{
+      <Tabs.Screen name='Gradebook' component={GradesScreen} options={{
         tabBarIcon: ({ focused, color, size }) => (
           focused ? 
             <MaterialCommunityIcons
