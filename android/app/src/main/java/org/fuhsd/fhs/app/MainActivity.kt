@@ -1,4 +1,4 @@
-package com.fhs.fremontapp
+package org.fuhsd.fhs.app
 
 import android.os.Build
 import android.os.Bundle

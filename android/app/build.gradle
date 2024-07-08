@@ -83,9 +83,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.fhs.fremontapp'
+    namespace 'org.fuhsd.fhs.app'
     defaultConfig {
-        applicationId 'com.fhs.fremontapp'
+        applicationId 'org.fuhsd.fhs.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
