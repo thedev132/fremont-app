@@ -9,10 +9,8 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import { useAuth, useRequest, useSignInWithProvider } from 'fremont-app-api-hooks';
 export default function LoginScreen({loggedIn, setLoggedIn }) {
-  
 
   WebBrowser.maybeCompleteAuthSession();
-  const [state, setState] = React.useState(String);
 
   const url = Linking.useURL();
 
@@ -28,7 +26,11 @@ export default function LoginScreen({loggedIn, setLoggedIn }) {
       body: body.toString(),
       "method": "POST",
     }).then((response) => response.json());
-    console.log(response);
+    const accessToken = response["access"];
+    const refreshToken = response["refresh"];
+    await AsyncStorage.setItem('accessToken', accessToken);
+    await AsyncStorage.setItem('refreshToken', refreshToken);
+    setLoggedIn(true);
   }
 
   useEffect(() => {
@@ -53,7 +55,6 @@ export default function LoginScreen({loggedIn, setLoggedIn }) {
       const parsedUrl = new URL(url);
       const state = decodeURIComponent(parsedUrl.searchParams.get('state'));
       console.log(url);
-      setState(state);
       WebBrowser.openAuthSessionAsync(url);
 
     } catch (error) {
