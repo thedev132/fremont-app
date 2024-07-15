@@ -1,6 +1,6 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, NavigationContainer, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack, Tabs } from 'expo-router';
+import { Stack, Tabs, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
@@ -12,11 +12,31 @@ import LoginScreen from './login';
 import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ConnectIFScreen from './ConnectInfiniteCampus';
+import { Linking } from 'expo-linking';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleDeepLink = (event) => {
+      const url = event.url;
+      if (url) {
+        const { path, queryParams } = Linking.parse(url);
+        // Navigate to the correct route with the path and queryParams
+        console.log(path, queryParams);
+        // router.push({ pathname: `/${path}`, queryParams });
+      }
+    };
+
+    
+
+  }, [router]);
+
   const colorScheme = useColorScheme();
 
   const [loggedIn, setLoggedIn] = React.useState(false);
