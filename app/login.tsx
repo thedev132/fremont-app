@@ -30,6 +30,7 @@ export default function LoginScreen({loggedIn, setLoggedIn }) {
     const refreshToken = response["refresh"];
     await AsyncStorage.setItem('accessToken', accessToken);
     await AsyncStorage.setItem('refreshToken', refreshToken);
+    await AsyncStorage.setItem('loggedIn', 'true');
     setLoggedIn(true);
   }
 

@@ -1,5 +1,5 @@
-import InfiniteCampus from '@/constants/InfiniteCampus';
-import Student from '@/constants/InfiniteCampusStudent';
+import InfiniteCampus from '@/hooks/InfiniteCampus/InfiniteCampus';
+import Student from '@/hooks/InfiniteCampus/InfiniteCampusStudent';
 import { useEffect, useState } from 'react';
 import { Text, View, Image, StyleSheet } from 'react-native';
 import { BarcodeCreatorView, BarcodeFormat } from "react-native-barcode-creator";

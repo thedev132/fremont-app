@@ -2,7 +2,7 @@ import React from 'react';
 import Course
  from './InfiniteCampusCourse';
 
-import Student from './InfiniteCampusStudent';
+import Student from '@/hooks/InfiniteCampus/InfiniteCampusStudent';
 
 export default class InfiniteCampus {
     public name: string | undefined;
@@ -28,7 +28,6 @@ export default class InfiniteCampus {
           }
     }
 
-    // WORK IN PROGRESS
     public async getGrades() {
         try {
             const response = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/portal/grades`, {
@@ -37,14 +36,25 @@ export default class InfiniteCampus {
             });
 
             let data = await response.json();
-            console.log(data);
-        
-            return Promise.resolve();
+            let courses = data[0]['courses'];
+            let gradesDict = {};
+
+            for (let course of courses) {
+                let courseName = course['courseName'];
+                gradesDict[courseName] = [];
+                
+                for (let gradingTask of course['gradingTasks']) {
+                    gradesDict[courseName].push({
+                        taskName: gradingTask['taskName'],
+                        score: gradingTask['score']
+                    });
+                }
+            }
+            return gradesDict;
           } catch (err) {
             return Promise.reject(err);
           }
     }
-    // https://fuhsd.infinitecampus.org/campus/resources/calendar/instructionalDay?calendarID=640
 
 
     public async getSchedule(date: Date | string) {
