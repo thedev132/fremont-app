@@ -1,38 +1,18 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect } from 'react';
 import { Image, StatusBar, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { Button, Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
+import { Button, Provider as PaperProvider, DefaultTheme, TextInput } from 'react-native-paper';
 import { SafeAreaFrameContext, SafeAreaView } from 'react-native-safe-area-context';
-import RootLayout from './_layout';
-import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
-import { useAuth, useRequest, useSignInWithProvider } from 'fremont-app-api-hooks';
+import { getToken } from '@/hooks/ServerAuth/GoogleLoginHelper';
 export default function LoginScreen({loggedIn, setLoggedIn }) {
 
+
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
   WebBrowser.maybeCompleteAuthSession();
-
-  const url = Linking.useURL();
-
-  const getToken = async (state, code) => {
-    const body = new URLSearchParams();
-    body.append('code', code);
-    body.append('state', state);
-    console.log(body.toString());
-    let response = await fetch("https://fremont-app-backend.vercel.app/api/auth/o/google/", {
-      "headers": {
-        "content-type": "application/x-www-form-urlencoded",
-      },
-      body: body.toString(),
-      "method": "POST",
-    }).then((response) => response.json());
-    const accessToken = response["access"];
-    const refreshToken = response["refresh"];
-    await AsyncStorage.setItem('accessToken', accessToken);
-    await AsyncStorage.setItem('refreshToken', refreshToken);
-    await AsyncStorage.setItem('loggedIn', 'true');
-    setLoggedIn(true);
-  }
 
   useEffect(() => {
     const handleDeepLink = (event) => {
@@ -40,6 +20,7 @@ export default function LoginScreen({loggedIn, setLoggedIn }) {
       const state = decodeURIComponent(parsedUrl.searchParams.get('state'));
       const code = decodeURIComponent(parsedUrl.searchParams.get('code'));
       getToken(state, code);
+      setLoggedIn(true);
     };
 
     const subscription = Linking.addEventListener('url', handleDeepLink);
@@ -48,7 +29,7 @@ export default function LoginScreen({loggedIn, setLoggedIn }) {
     };
   }, []);
 
-  const handleLoginPress = async () => {
+  const handleGoogleLoginPress = async () => {
     try {
       const response = await fetch('https://fremont-app-backend.vercel.app/api/auth/o/google/?redirect_uri=https%3A%2F%2Ffremont-app-backend.vercel.app%2Fredirect', {cache: "no-store"});
       const data = await response.json();
@@ -63,34 +44,89 @@ export default function LoginScreen({loggedIn, setLoggedIn }) {
     }
   };
 
+  const handleLoginPress = async () => {
+  };
   return (
     <PaperProvider>
-      <SafeAreaView style={{flex:1, backgroundColor: '#1e1e1e'}}>
-        <View className='flex justify-between items-center' style={{flex:1}}>
+      <SafeAreaView style={{flex:1, backgroundColor: '#fff'}}>
+        <View className='flex justify-between items-center' style={{flex:1, marginTop: 50}}>
           <View className='flex items-center'>
             <Image
               className='mt-16 mb-10'
               source={require('../assets/images/logo.png')}
             />
-            <Text className='text-white text-4xl mt-5 font-bold'>Fremont High School</Text>
-            <Text className='text-white text-2xl mt-2 font-semibold'>Home of the firebirds</Text>
+            <Text className='text-black text-4xl mt-5 font-bold'>Fremont High School</Text>
+            <Text className='text-black text-2xl mt-2 font-semibold'>Home of the firebirds</Text>
+            <View style={{width: 300, marginTop: 30}}>
+                <TextInput
+                      mode='outlined'
+                      value={email}
+                      onChangeText={text => setEmail(text)}
+                      outlineStyle={{borderRadius: 15, backgroundColor: '#eee', shadowColor: '#000', borderColor: '#eee', shadowOffset: {width: 0, height: 1}, shadowOpacity: 0.2, shadowRadius: 1.41, elevation: 2}}
+                      style={{marginBottom: 10}}
+                      placeholder='Email'
+                      cursorColor='#BF1B1B'
+                      selectionColor='#BF1B1B'
+                />
+                <TextInput
+                      mode='outlined'
+                      value={password}
+                      onChangeText={text => setPassword(text)}
+                      secureTextEntry={true}
+                      outlineStyle={{borderRadius: 15, backgroundColor: '#eee', shadowColor: '#000', borderColor: '#eee', shadowOffset: {width: 0, height: 1}, shadowOpacity: 0.2, shadowRadius: 1.41, elevation: 2}}
+                      style={{marginBottom: 10}}
+                      placeholder='Password'
+                      cursorColor='#BF1B1B'
+                      selectionColor='#BF1B1B'
+
+                />
+                <TouchableOpacity onPress={() => handleLoginPress()}>
+                    <View style={{backgroundColor: '#BF1B1B', padding: 15, paddingHorizontal: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', marginBottom: 10}}>
+                        <Text className='text-white text-xl ml-3 font-bold'>Login</Text>
+                    </View>
+                </TouchableOpacity>
+                <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 30}}>
+                  <View style={{flex: 1, height: 2, backgroundColor: 'black'}} />
+                  <View>
+                    <Text style={{width: 50, textAlign: 'center', fontSize: 24, fontWeight: '500'}}>or</Text>
+                  </View>
+                  <View style={{flex: 1, height: 2, backgroundColor: 'black'}} />
+                </View>
+                <TouchableOpacity onPress={() => handleGoogleLoginPress()}>
+                  <View style={{backgroundColor: '#BF1B1B', padding: 15, paddingHorizontal: 30, borderRadius: 15, alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start', marginBottom: 10}}>
+                      <Image source={require('../assets/images/google.png')}/>
+                      <Text className='text-white text-xl ml-3 font-semibold'>Sign in with Google</Text>
+                  </View>
+                </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        <View  style={{position: 'absolute', bottom: 0, left:0, right: 0, alignItems: 'center', marginBottom: 50}}>
-        <TouchableOpacity onPress={() => handleLoginPress()}>
-                <View style={{backgroundColor: '#BF1B1B', padding: 20, paddingHorizontal: 30, borderRadius: 15, alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start', marginBottom: 10}}>
-                    <Image source={require('../assets/images/schoology.png')}/>
-                    <Text className='text-white text-xl ml-3 font-bold'>Sign in with Schoology</Text>
-                </View>
-            </TouchableOpacity>
-            {/* <TouchableOpacity onPress={() => { AsyncStorage.setItem('loggedIn', 'true'); setLoggedIn(true) }}>
-                <View style={{backgroundColor: '#333130', padding: 20, paddingLeft: 35, paddingRight: 64, borderRadius: 15, alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start'}}>
-                    <Image source={require('../assets/images/guest.png')}/>
-                    <Text className='text-white text-xl ml-3 font-bold'>Continue as Guest</Text>
-                </View>
-            </TouchableOpacity> */}
         </View>
       </SafeAreaView>
     </PaperProvider>
   )
 }
+
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+  },
+  input: {
+    height: 55,
+    paddingHorizontal: 12,
+    borderRadius: 15,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  inputStyle: { fontSize: 16 },
+  labelStyle: { fontSize: 14 },
+  placeholderStyle: { fontSize: 16 },
+  textErrorStyle: { fontSize: 16 },
+});
