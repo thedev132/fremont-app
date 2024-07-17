@@ -6,6 +6,7 @@ import { SafeAreaFrameContext, SafeAreaView } from 'react-native-safe-area-conte
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import { getToken } from '@/hooks/ServerAuth/GoogleLoginHelper';
+import { login } from '@/hooks/ServerAuth/ManuelLoginHelper';
 export default function LoginScreen({loggedIn, setLoggedIn }) {
 
 
@@ -45,6 +46,16 @@ export default function LoginScreen({loggedIn, setLoggedIn }) {
   };
 
   const handleLoginPress = async () => {
+    try {
+      await login(email, password);
+      let accessToken = await AsyncStorage.getItem('accessToken');
+      if (accessToken !== null) {
+        await AsyncStorage.setItem('loggedIn', 'true');
+        setLoggedIn(true);
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+    }
   };
   return (
     <PaperProvider>
