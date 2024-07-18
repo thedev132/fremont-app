@@ -1,5 +1,4 @@
-import { DarkTheme, DefaultTheme, NavigationContainer, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
+import 'react-native-gesture-handler';import { useFonts } from 'expo-font';
 import { Stack, Tabs, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
@@ -9,10 +8,12 @@ import * as React from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import TabLayout from './tabs/_layout';
 import LoginScreen from './login';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ConnectIFScreen from './ConnectInfiniteCampus';
 import { Linking } from 'expo-linking';
+import Register from './register';
+import { Button } from 'react-native';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -36,8 +37,6 @@ export default function RootLayout() {
     
 
   }, [router]);
-
-  const colorScheme = useColorScheme();
 
   const [loggedIn, setLoggedIn] = React.useState(false);
   const [IF, setIF] = React.useState(false);
@@ -97,7 +96,9 @@ export default function RootLayout() {
   return (
       <Stack.Navigator
         screenOptions={{
-          headerShown: false
+          headerShown: false,
+          gestureEnabled: true,
+          ...TransitionPresets.ModalSlideFromBottomIOS,
         }}>
        {loggedIn ? (
           IF ? (
@@ -109,10 +110,18 @@ export default function RootLayout() {
             />
           )
         ) : (
-          <Stack.Screen
-            name="login"
-            children={() => <LoginScreen loggedIn={loggedIn} setLoggedIn={setLoggedIn} />}
-          />
+          <Stack.Group>
+            <Stack.Group>
+              <Stack.Screen
+                name="login"
+                component={LoginScreen}
+              />
+            </Stack.Group>
+
+            <Stack.Group screenOptions={{presentation: 'modal'}}>
+              <Stack.Screen name="register" component={Register} options={{headerShown: true, headerTitleAlign: 'center', headerTitle: 'Register'}}/>
+            </Stack.Group>
+          </Stack.Group>
         )}
 
       </Stack.Navigator>

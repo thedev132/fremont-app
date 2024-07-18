@@ -30,9 +30,12 @@ export const login = async (email: string, password: string) => {
             "method": "POST",
           });
         let data = await response.json();
+        if (!response.ok) {
+            return false;
+        }
         await AsyncStorage.setItem('accessToken', data['access']);
         await AsyncStorage.setItem('refreshToken', data['refresh']);
-        return Promise.resolve();
+        return true;
     } catch (err) {
         return Promise.reject(err);
     }

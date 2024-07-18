@@ -7,8 +7,9 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import { getToken } from '@/hooks/ServerAuth/GoogleLoginHelper';
 import { login } from '@/hooks/ServerAuth/ManuelLoginHelper';
-export default function LoginScreen({loggedIn, setLoggedIn }) {
 
+
+export default function LoginScreen({navigation}) {
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -21,7 +22,7 @@ export default function LoginScreen({loggedIn, setLoggedIn }) {
       const state = decodeURIComponent(parsedUrl.searchParams.get('state'));
       const code = decodeURIComponent(parsedUrl.searchParams.get('code'));
       getToken(state, code);
-      setLoggedIn(true);
+      navigation.navigate('tabs');
     };
 
     const subscription = Linking.addEventListener('url', handleDeepLink);
@@ -34,9 +35,8 @@ export default function LoginScreen({loggedIn, setLoggedIn }) {
     try {
       const response = await fetch('https://fremont-app-backend.vercel.app/api/auth/o/google/?redirect_uri=https%3A%2F%2Ffremont-app-backend.vercel.app%2Fredirect', {cache: "no-store"});
       const data = await response.json();
-      const url = data["authorization_url"]; // Adjust based on your API response
+      const url = data["authorization_url"]; 
       const parsedUrl = new URL(url);
-      const state = decodeURIComponent(parsedUrl.searchParams.get('state'));
       console.log(url);
       WebBrowser.openAuthSessionAsync(url);
 
@@ -47,11 +47,10 @@ export default function LoginScreen({loggedIn, setLoggedIn }) {
 
   const handleLoginPress = async () => {
     try {
-      await login(email, password);
-      let accessToken = await AsyncStorage.getItem('accessToken');
-      if (accessToken !== null) {
+      let response = await login(email, password);
+      if (response) {
         await AsyncStorage.setItem('loggedIn', 'true');
-        setLoggedIn(true);
+        navigation.navigate('tabs');
       }
     } catch (error) {
       console.error("Error logging in:", error);
@@ -60,7 +59,7 @@ export default function LoginScreen({loggedIn, setLoggedIn }) {
   return (
     <PaperProvider>
       <SafeAreaView style={{flex:1, backgroundColor: '#fff'}}>
-        <View className='flex justify-between items-center' style={{flex:1, marginTop: 50}}>
+        <View className='flex items-center' style={{flex:1, marginTop: 50}}>
           <View className='flex items-center'>
             <Image
               className='mt-16 mb-10'
@@ -92,10 +91,11 @@ export default function LoginScreen({loggedIn, setLoggedIn }) {
 
                 />
                 <TouchableOpacity onPress={() => handleLoginPress()}>
-                    <View style={{backgroundColor: '#BF1B1B', padding: 15, paddingHorizontal: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', marginBottom: 10}}>
+                    <View style={{backgroundColor: '#BF1B1B', padding: 15, paddingHorizontal: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center'}}>
                         <Text className='text-white text-xl ml-3 font-bold'>Login</Text>
                     </View>
                 </TouchableOpacity>
+                <TouchableOpacity onPress={() =>{ navigation.navigate("register")}}><Text className='text-gray-600 text-md mt-5 text-center mb-5'>Don't have an account?</Text></TouchableOpacity>
                 <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 30}}>
                   <View style={{flex: 1, height: 2, backgroundColor: 'black'}} />
                   <View>
@@ -118,26 +118,3 @@ export default function LoginScreen({loggedIn, setLoggedIn }) {
 }
 
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-  },
-  input: {
-    height: 55,
-    paddingHorizontal: 12,
-    borderRadius: 15,
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  },
-  inputStyle: { fontSize: 16 },
-  labelStyle: { fontSize: 14 },
-  placeholderStyle: { fontSize: 16 },
-  textErrorStyle: { fontSize: 16 },
-});
