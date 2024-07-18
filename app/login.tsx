@@ -22,7 +22,7 @@ export default function LoginScreen({navigation}) {
       const state = decodeURIComponent(parsedUrl.searchParams.get('state'));
       const code = decodeURIComponent(parsedUrl.searchParams.get('code'));
       getToken(state, code);
-      navigation.navigate('tabs');
+      navigation.navigate('ConnectInfiniteCampus');
     };
 
     const subscription = Linking.addEventListener('url', handleDeepLink);
@@ -50,7 +50,7 @@ export default function LoginScreen({navigation}) {
       let response = await login(email, password);
       if (response) {
         await AsyncStorage.setItem('loggedIn', 'true');
-        navigation.navigate('tabs');
+        navigation.navigate('ConnectInfiniteCampus');
       }
     } catch (error) {
       console.error("Error logging in:", error);

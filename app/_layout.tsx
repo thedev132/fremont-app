@@ -119,7 +119,7 @@ export default function RootLayout() {
             </Stack.Group>
 
             <Stack.Group screenOptions={{presentation: 'modal'}}>
-              <Stack.Screen name="register" component={Register} options={{headerShown: true, headerTitleAlign: 'center', headerTitle: 'Register'}}/>
+              <Stack.Screen name="register" component={Register} options={{headerShown: true, headerTransparent: true, headerTitle: ''}}/>
             </Stack.Group>
           </Stack.Group>
         )}
