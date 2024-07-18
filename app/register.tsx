@@ -1,22 +1,41 @@
 import React from "react"
 import { TouchableOpacity, View, Text} from "react-native"
-import { PaperProvider, TextInput } from "react-native-paper"
-import { register } from "@/hooks/ServerAuth/ManuelLoginHelper";
+import { ActivityIndicator, PaperProvider, TextInput } from "react-native-paper"
+import { login, register } from "@/hooks/ServerAuth/ManuelLoginHelper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Register({navigation}) {
 
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [repassword, setRePassword] = React.useState('');
-    function handleLoginPress(): void {
+    const [loading, setLoading] = React.useState(false);
+
+    async function handleLoginPress(): Promise<void> {
         if (password !== repassword) {
             // Show error message
             return;
         }
         // Register the user
-        register(email, password);
-        
-        navigation.navigate('tabs');
+        try {
+            register(email, password);
+            let response = await login(email, password);
+            if (response) {
+              await AsyncStorage.setItem('loggedIn', 'true');
+              // trigger a loading screen
+            setLoading(true);
+            }
+          } catch (error) {
+            console.error("Error logging in:", error);
+          }        
+    }
+
+    if (loading) {
+        return (
+            <View style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
+                <ActivityIndicator size='large' color='#BF1B1B'/>
+            </View>
+        )
     }
 
     return (

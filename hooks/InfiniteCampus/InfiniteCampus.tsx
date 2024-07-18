@@ -90,7 +90,7 @@ export default class InfiniteCampus {
 
             return courses;
           } catch (err) {
-            console.log('error2');
+            console.log(err);
             return Promise.reject(err);
           }
     }

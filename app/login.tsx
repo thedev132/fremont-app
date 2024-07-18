@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect } from 'react';
-import { Image, StatusBar, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { Image, StatusBar, StyleSheet, View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Button, Provider as PaperProvider, DefaultTheme, TextInput } from 'react-native-paper';
 import { SafeAreaFrameContext, SafeAreaView } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
@@ -13,6 +13,7 @@ export default function LoginScreen({navigation}) {
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
 
   WebBrowser.maybeCompleteAuthSession();
 
@@ -50,12 +51,23 @@ export default function LoginScreen({navigation}) {
       let response = await login(email, password);
       if (response) {
         await AsyncStorage.setItem('loggedIn', 'true');
-        navigation.navigate('ConnectInfiniteCampus');
+        // trigger a loading screen
+        setLoading(true);
+
       }
     } catch (error) {
       console.error("Error logging in:", error);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size='large' color='#BF1B1B'/>
+      </View>
+    )
+  }
+  
   return (
     <PaperProvider>
       <SafeAreaView style={{flex:1, backgroundColor: '#fff'}}>
@@ -116,5 +128,3 @@ export default function LoginScreen({navigation}) {
     </PaperProvider>
   )
 }
-
-

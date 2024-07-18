@@ -10,14 +10,17 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 
 export default function IDCardScreen() {
 
+    function stripAfterAtSymbol(inputString) {
+        return inputString.split('@')[0];
+      }
     
     const [studentInfo, setStudentInfo] = useState<Student>();
     useEffect(() => {
 
         const fetchData = async () => {
-            let username = await AsyncStorage.getItem('IFUsername');
+            let email = await AsyncStorage.getItem('IFEmail');
             let password = await EncryptedStorage.getItem('IFPassword');
-            let user = new InfiniteCampus(username, password);
+            let user = new InfiniteCampus(stripAfterAtSymbol(email), password);
             user.login();
             try {
                 let student = await user.getStudentInfo();

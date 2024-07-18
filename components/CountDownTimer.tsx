@@ -72,17 +72,17 @@ const getCurrentTime = () => {
       <CountdownCircleTimer
         isPlaying = {isClassOngoing}
         duration={totalClassDuration} // duration in seconds
-        initialRemainingTime={isClassOngoing ? totalClassDuration - elapsedTime : 2000} // elapsed time in seconds
-        colors={['#fc0303', '#0324fc']}
+        initialRemainingTime={isClassOngoing ? remainingTime : 2000} // elapsed time in seconds
+        colors={['#8B0000', '#8B0000']}
         colorsTime={[totalClassDuration, 0]}
         size={250}
         strokeWidth={16}
         trailStrokeWidth={15}
-        trailColor="rgba(255, 255, 255, 0.3)"
+        trailColor="rgba(233, 233, 233, 1)"
         
       >
         {() => (
-          <Text style={{color: '#fff', fontSize: 30, textAlign: 'center'}}>
+          <Text style={{color: '#000', fontSize: 40, fontWeight: 'bold', textAlign: 'center', fontFamily: 'Inter-Bold'}}>
             {isClassOngoing
               ? `${Math.ceil(remainingTime / 60)}:${remainingTime % 60 < 10 ? '0' : ''}${remainingTime % 60}`
               : `Next class in ${Math.ceil(remainingTime / 60)}:${remainingTime % 60 < 10 ? '0' : ''}${remainingTime % 60}`}

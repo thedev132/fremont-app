@@ -44,6 +44,22 @@ export default function RootLayout() {
 
 
   const Stack = createStackNavigator();
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      let loggedIn = await AsyncStorage.getItem('loggedIn');
+      if (loggedIn === 'true') {
+        setLoggedIn(true);
+      }
+      else {
+        setLoggedIn(false);
+      }
+
+    }, 1000); // Update every second
+
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const loadData = async () => {
       try {

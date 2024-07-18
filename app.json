@@ -31,12 +31,10 @@
     },
     "plugins": [
       "expo-router",
-      [
-        "@react-native-google-signin/google-signin",
+      "expo-font",
         {
-          "iosUrlScheme": "com.googleusercontent.apps.992532730138-88bgvipfev475lsffh6ctqbaglpjlqnq"
+          "fonts": ["./assets/fonts/Inter-Bold.ttf"]
         }
-      ]
     ],
     "experiments": {
       "typedRoutes": true
