@@ -24,6 +24,8 @@ export default function LoginScreen({navigation}) {
       const code = decodeURIComponent(parsedUrl.searchParams.get('code'));
       getToken(state, code);
       setLoading(true);
+      navigation.navigate('auth/ConnectInfiniteCampus');
+
     };
 
     const subscription = Linking.addEventListener('url', handleDeepLink);
@@ -34,12 +36,12 @@ export default function LoginScreen({navigation}) {
 
   const handleGoogleLoginPress = async () => {
     try {
+      setLoading(true);
       const response = await fetch('https://fremont-app-backend.vercel.app/api/auth/o/google/?redirect_uri=https%3A%2F%2Ffremont-app-backend.vercel.app%2Fredirect', {cache: "no-store"});
       const data = await response.json();
       const url = data["authorization_url"]; 
-      const parsedUrl = new URL(url);
       console.log(url);
-      WebBrowser.openAuthSessionAsync(url);
+      WebBrowser.openAuthSessionAsync(url)
 
     } catch (error) {
       console.error("Error fetching state value:", error);
@@ -49,10 +51,10 @@ export default function LoginScreen({navigation}) {
   const handleLoginPress = async () => {
     try {
       let response = await login(email, password);
+      setLoading(true);
       if (response) {
-        await AsyncStorage.setItem('loggedIn', 'true');
         // trigger a loading screen
-        setLoading(true);
+        navigation.navigate('auth/ConnectInfiniteCampus');
 
       }
     } catch (error) {

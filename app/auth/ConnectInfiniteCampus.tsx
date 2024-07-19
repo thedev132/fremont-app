@@ -4,7 +4,7 @@ import { Text, View, TouchableOpacity } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
-export default function ConnectIFScreen({IF, setIF}) {
+export default function ConnectIFScreen({loggedIn, setLoggedIn}) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -14,8 +14,8 @@ export default function ConnectIFScreen({IF, setIF}) {
             // Store username and encrypted password
             await AsyncStorage.setItem('IFEmail', email);
             await EncryptedStorage.setItem('IFPassword', password);
-            await AsyncStorage.setItem('IF', 'true');
-            setIF(true);
+            await AsyncStorage.setItem('loggedIn', 'true');
+            setLoggedIn(true);
 
         } catch (error) {
             console.error('Error storing credentials:', error);

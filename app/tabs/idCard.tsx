@@ -7,13 +7,9 @@ import Divider from '@/components/Divider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import React from 'react';
-
+import {stripAfterAtSymbol} from '@/constants/utils';
 
 export default function IDCardScreen() {
-
-    function stripAfterAtSymbol(inputString) {
-        return inputString.split('@')[0];
-      }
     
     const [studentInfo, setStudentInfo] = useState<Student>();
     useEffect(() => {

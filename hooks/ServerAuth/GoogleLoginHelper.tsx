@@ -18,6 +18,6 @@ export const getToken = async (state, code) => {
     const refreshToken = response["refresh"];
     await AsyncStorage.setItem('accessToken', accessToken);
     await AsyncStorage.setItem('refreshToken', refreshToken);
-    await AsyncStorage.setItem('loggedIn', 'true');
+    // await AsyncStorage.setItem('loggedIn', 'true');
     
   }

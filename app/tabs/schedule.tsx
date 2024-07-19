@@ -8,16 +8,13 @@ import formatTime from '@/constants/FormatTime';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import calculateTimes from '@/components/CountDownTimer'
+import {stripAfterAtSymbol} from '@/constants/utils';
 
 export default function ScheduleScreen() {
   const [uniqueCourses, setUniqueCourses] = useState([]);
   const [classTimes, setClassTimes] = useState({ classes: [] });
   const [loading, setLoading] = useState(true); // Loading state
   const [isAfterSchool, setIsAfterSchool] = useState(false);
-
-  function stripAfterAtSymbol(inputString) {
-    return inputString.split('@')[0];
-  }
 
 
   useEffect(() => {

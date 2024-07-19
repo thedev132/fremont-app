@@ -19,11 +19,10 @@ export default function Register({navigation}) {
         // Register the user
         try {
             register(email, password);
-            let response = await login(email, password);
-            if (response) {
-              await AsyncStorage.setItem('loggedIn', 'true');
-              // trigger a loading screen
             setLoading(true);
+            let response = await login(email, password);
+            if (response) {  
+              navigation.navigate('auth/ConnectInfiniteCampus');
             }
           } catch (error) {
             console.error("Error logging in:", error);

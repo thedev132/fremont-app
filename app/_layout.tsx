@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import * as React from 'react';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
 import TabLayout from './tabs/_layout';
 import LoginScreen from './auth/login';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
@@ -45,33 +44,13 @@ export default function RootLayout() {
 
   const Stack = createStackNavigator();
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      let loggedIn = await AsyncStorage.getItem('loggedIn');
-      if (loggedIn === 'true') {
-        setLoggedIn(true);
-      }
-      else {
-        setLoggedIn(false);
-      }
 
-    }, 1000); // Update every second
-
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         await SplashScreen.hideAsync();
         const value = await AsyncStorage.getItem('loggedIn');
-        const IF = await AsyncStorage.getItem('IF');
-        if (IF === 'true') {
-          setIF(true);
-        }
-        else if (IF === 'false') {
-          setIF(false);
-        }
         if (value === null || value === 'false') {
           await AsyncStorage.setItem('loggedIn', 'false');
           setLoggedIn(false);
@@ -117,14 +96,7 @@ export default function RootLayout() {
           ...TransitionPresets.ModalSlideFromBottomIOS,
         }}>
        {loggedIn ? (
-          IF ? (
             <Stack.Screen name="tabs" component={TabLayout} />
-          ) : (
-            <Stack.Screen
-              name="auth/ConnectInfiniteCampus"
-              children={() => <ConnectIFScreen IF={IF} setIF={setIF} />}
-            />
-          )
         ) : (
           <Stack.Group>
             <Stack.Group>
@@ -136,6 +108,10 @@ export default function RootLayout() {
 
             <Stack.Group screenOptions={{presentation: 'modal'}}>
               <Stack.Screen name="auth/register" component={Register} options={{headerShown: true, headerTransparent: true, headerTitle: ''}}/>
+              <Stack.Screen
+              name="auth/ConnectInfiniteCampus"
+              children={() => <ConnectIFScreen loggedIn={loggedIn} setLoggedIn={setLoggedIn} />}
+            />
             </Stack.Group>
           </Stack.Group>
         )}
