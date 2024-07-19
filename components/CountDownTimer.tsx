@@ -9,7 +9,6 @@ const getCurrentTime = () => {
   const seconds = now.getSeconds();
   return { hours, minutes, seconds };
 };
-
 const calculateTimes = (classTimes) => {
   const { hours: currentHours, minutes: currentMinutes, seconds: currentSeconds } = getCurrentTime();
   const currentTimeInSeconds = currentHours * 3600 + currentMinutes * 60 + currentSeconds;
@@ -40,7 +39,7 @@ const calculateTimes = (classTimes) => {
     if (currentTimeInSeconds >= classStartInSeconds && currentTimeInSeconds <= classEndInSeconds) {
       const elapsedTimeInClass = currentTimeInSeconds - classStartInSeconds;
       remainingTime = classEndInSeconds - currentTimeInSeconds;
-      totalClassDuration += classDuration; // Accumulate only ongoing class duration
+      totalClassDuration = classEndInSeconds - classStartInSeconds; // Set to the duration of the ongoing class
       isClassOngoing = true;
       elapsedTime = elapsedTimeInClass;
       afterSchool = false;
@@ -49,8 +48,10 @@ const calculateTimes = (classTimes) => {
       remainingTime = classStartInSeconds - currentTimeInSeconds;
       afterSchool = false;
     } else {
-      // Add to totalClassDuration if class has ended
-      totalClassDuration += classDuration;
+      // Only accumulate totalClassDuration if class has ended but not if it is currently ongoing
+      if (!isClassOngoing) {
+        totalClassDuration += classDuration;
+      }
     }
 
     prevClassEndInSeconds = classEndInSeconds;
@@ -62,6 +63,7 @@ const calculateTimes = (classTimes) => {
 
   return { remainingTime, isClassOngoing, totalClassDuration, elapsedTime, totalBreakDuration, afterSchool };
 };
+
 
 const ClassCountdown = ({ time }) => {
   const initialCalculation = calculateTimes(time);

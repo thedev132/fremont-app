@@ -1,50 +1,117 @@
-import 'react-native-gesture-handler';import { useFonts } from 'expo-font';
-import { Stack, Tabs, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { Text, View, Button, Platform } from 'react-native';
 import * as React from 'react';
-
 import TabLayout from './tabs/_layout';
 import LoginScreen from './auth/login';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ConnectIFScreen from './auth/ConnectInfiniteCampus';
-import { Linking } from 'expo-linking';
 import Register from './auth/register';
-import { Button } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+import * as Device from 'expo-device';
+import UpdateExpoPushToken from '@/hooks/ServerAuth/UpdateExpoPushToken';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
 
-
-  const router = useRouter();
-
-  useEffect(() => {
-    const handleDeepLink = (event) => {
-      const url = event.url;
-      if (url) {
-        const { path, queryParams } = Linking.parse(url);
-        // Navigate to the correct route with the path and queryParams
-        console.log(path, queryParams);
-        // router.push({ pathname: `/${path}`, queryParams });
-      }
-    };
-
-    
-
-  }, [router]);
-
   const [loggedIn, setLoggedIn] = React.useState(false);
-  const [IF, setIF] = React.useState(false);
   const [appIsReady, setAppIsReady] = React.useState(false);
-
-
+  const [expoPushToken, setExpoPushToken] = React.useState('');
+  const [notification, setNotification] = React.useState<Notifications.Notification | undefined>(
+    undefined
+  );
+  const notificationListener = React.useRef<Notifications.Subscription>();
+  const responseListener = React.useRef<Notifications.Subscription>();
   const Stack = createStackNavigator();
 
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
 
+  function handleRegistrationError(errorMessage: string) {
+    alert(errorMessage);
+    throw new Error(errorMessage);
+  }
+  
+  async function registerForPushNotificationsAsync() {
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+  
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      
+      const projectId =
+        Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+      if (!projectId) {
+        handleRegistrationError('Project ID not found');
+      }
+      try {
+        const pushTokenString = (
+          await Notifications.getExpoPushTokenAsync({
+            projectId,
+          })
+        ).data;
+        let accessToken = await AsyncStorage.getItem('accessToken');
+        if (accessToken === null || accessToken === '') {
+          return;
+        }
+        else {
+          UpdateExpoPushToken(pushTokenString)
+          console.log(accessToken);
+        }
+        console.log(pushTokenString);
+        return pushTokenString;
+      } catch (e: unknown) {
+        handleRegistrationError(`${e}`);
+      }
+  }
+  
+  useEffect(() => {
+    registerForPushNotificationsAsync()
+      .then(token => setExpoPushToken(token ?? ''))
+      .catch((error: any) => setExpoPushToken(`${error}`));
+    const storeToken = async (token: string) => {
+      await AsyncStorage.setItem('expoPushToken', token);
+    };
+    storeToken(expoPushToken);
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+    return () => {
+      notificationListener.current &&
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      responseListener.current &&
+        Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
