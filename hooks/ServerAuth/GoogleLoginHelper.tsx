@@ -13,6 +13,7 @@ export const getToken = async (state, code) => {
       body: body.toString(),
       "method": "POST",
     }).then((response) => response.json());
+    console.log(response);
     const accessToken = response["access"];
     const refreshToken = response["refresh"];
     await AsyncStorage.setItem('accessToken', accessToken);

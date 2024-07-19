@@ -1,19 +1,15 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import { AnimatedTabBarNavigator } from "react-native-animated-nav-tab-bar";
-import TabTwoScreen from './explore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import IDCardScreen from './idCard';
 import ScheduleScreen from './schedule';
 import GradesScreen from './grades';
+import NotificationScreen from './notifications';
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
   const Tabs = AnimatedTabBarNavigator();
 
   return (
@@ -36,7 +32,7 @@ export default function TabLayout() {
               color={'black'}
               focused={focused} />
         )}} />
-      <Tabs.Screen name='Announcements' component={TabTwoScreen} options={{
+      <Tabs.Screen name='Announcements' component={NotificationScreen} options={{
         tabBarIcon: ({ focused, color, size }) => (
           focused ? 
             <Ionicons

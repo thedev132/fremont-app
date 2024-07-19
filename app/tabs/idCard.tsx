@@ -6,6 +6,7 @@ import { BarcodeCreatorView, BarcodeFormat } from "react-native-barcode-creator"
 import Divider from '@/components/Divider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EncryptedStorage from 'react-native-encrypted-storage';
+import React from 'react';
 
 
 export default function IDCardScreen() {

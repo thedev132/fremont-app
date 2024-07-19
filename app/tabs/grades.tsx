@@ -1,5 +1,6 @@
 import InfiniteCampus from '@/hooks/InfiniteCampus/InfiniteCampus';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
 import { useEffect, useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import EncryptedStorage from 'react-native-encrypted-storage';

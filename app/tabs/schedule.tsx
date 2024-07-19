@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import InfiniteCampus from '@/hooks/InfiniteCampus/InfiniteCampus';
 import Course from '@/hooks/InfiniteCampus/InfiniteCampusCourse';
@@ -8,15 +7,18 @@ import ClassCountdown from '@/components/CountDownTimer';
 import formatTime from '@/constants/FormatTime';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EncryptedStorage from 'react-native-encrypted-storage';
+import calculateTimes from '@/components/CountDownTimer'
 
 export default function ScheduleScreen() {
   const [uniqueCourses, setUniqueCourses] = useState([]);
   const [classTimes, setClassTimes] = useState({ classes: [] });
   const [loading, setLoading] = useState(true); // Loading state
+  const [isAfterSchool, setIsAfterSchool] = useState(false);
 
   function stripAfterAtSymbol(inputString) {
     return inputString.split('@')[0];
   }
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,6 +40,7 @@ export default function ScheduleScreen() {
           }
         }
         setClassTimes(newClassTimes);
+
         setLoading(false); 
 
       } catch (error) {
@@ -91,7 +94,7 @@ export default function ScheduleScreen() {
       <View style={{ alignItems: 'center', flex: 1, backgroundColor: '#fff' }}>
         <SafeAreaView style={{ marginTop: 30, width: '100%', alignItems: 'center' }}>
           <View style={{ marginBottom: 10 }}>
-            <ClassCountdown time={classTimes} />
+              <ClassCountdown time={classTimes} />
           </View>
           <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%', marginBottom: 100 }}>
             {uniqueCourses.map((course, index) => (

@@ -23,7 +23,7 @@ export default function LoginScreen({navigation}) {
       const state = decodeURIComponent(parsedUrl.searchParams.get('state'));
       const code = decodeURIComponent(parsedUrl.searchParams.get('code'));
       getToken(state, code);
-      navigation.navigate('ConnectInfiniteCampus');
+      setLoading(true);
     };
 
     const subscription = Linking.addEventListener('url', handleDeepLink);
@@ -75,7 +75,7 @@ export default function LoginScreen({navigation}) {
           <View className='flex items-center'>
             <Image
               className='mt-16 mb-10'
-              source={require('../assets/images/logo.png')}
+              source={require('../../assets/images/logo.png')}
             />
             <Text className='text-black text-4xl mt-5 font-bold'>Fremont High School</Text>
             <Text className='text-black text-2xl mt-2 font-semibold'>Home of the firebirds</Text>
@@ -107,7 +107,7 @@ export default function LoginScreen({navigation}) {
                         <Text className='text-white text-xl ml-3 font-bold'>Login</Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() =>{ navigation.navigate("register")}}><Text className='text-gray-600 text-md mt-5 text-center mb-5'>Don't have an account?</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() =>{ navigation.navigate("auth/register")}}><Text className='text-gray-600 text-md mt-5 text-center mb-5'>Don't have an account?</Text></TouchableOpacity>
                 <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 30}}>
                   <View style={{flex: 1, height: 2, backgroundColor: 'black'}} />
                   <View>
@@ -117,7 +117,7 @@ export default function LoginScreen({navigation}) {
                 </View>
                 <TouchableOpacity onPress={() => handleGoogleLoginPress()}>
                   <View style={{backgroundColor: '#BF1B1B', padding: 15, paddingHorizontal: 30, borderRadius: 15, alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start', marginBottom: 10}}>
-                      <Image source={require('../assets/images/google.png')}/>
+                      <Image source={require('../../assets/images/google.png')}/>
                       <Text className='text-white text-xl ml-3 font-semibold'>Sign in with Google</Text>
                   </View>
                 </TouchableOpacity>

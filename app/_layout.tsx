@@ -7,12 +7,12 @@ import * as React from 'react';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import TabLayout from './tabs/_layout';
-import LoginScreen from './login';
+import LoginScreen from './auth/login';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ConnectIFScreen from './ConnectInfiniteCampus';
+import ConnectIFScreen from './auth/ConnectInfiniteCampus';
 import { Linking } from 'expo-linking';
-import Register from './register';
+import Register from './auth/register';
 import { Button } from 'react-native';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -121,7 +121,7 @@ export default function RootLayout() {
             <Stack.Screen name="tabs" component={TabLayout} />
           ) : (
             <Stack.Screen
-              name="ConnectInfiniteCampus"
+              name="auth/ConnectInfiniteCampus"
               children={() => <ConnectIFScreen IF={IF} setIF={setIF} />}
             />
           )
@@ -129,13 +129,13 @@ export default function RootLayout() {
           <Stack.Group>
             <Stack.Group>
               <Stack.Screen
-                name="login"
+                name="auth/login"
                 component={LoginScreen}
               />
             </Stack.Group>
 
             <Stack.Group screenOptions={{presentation: 'modal'}}>
-              <Stack.Screen name="register" component={Register} options={{headerShown: true, headerTransparent: true, headerTitle: ''}}/>
+              <Stack.Screen name="auth/register" component={Register} options={{headerShown: true, headerTransparent: true, headerTitle: ''}}/>
             </Stack.Group>
           </Stack.Group>
         )}

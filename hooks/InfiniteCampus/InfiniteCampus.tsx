@@ -72,6 +72,9 @@ export default class InfiniteCampus {
             });
 
             let dataForDay = await responseDay.json();
+            if (dataForDay.length === 0) {
+                return "No school today";
+            }
             let todayPeriodScheduleID = dataForDay[0]['periodScheduleID']
 
             // do a foreach for the data
