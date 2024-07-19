@@ -80,9 +80,7 @@ export default function RootLayout() {
         }
         else {
           UpdateExpoPushToken(pushTokenString)
-          console.log(accessToken);
         }
-        console.log(pushTokenString);
         return pushTokenString;
       } catch (e: unknown) {
         handleRegistrationError(`${e}`);
@@ -102,7 +100,7 @@ export default function RootLayout() {
     });
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
+      console.log(response['notification']['request']['content']);
     });
 
     return () => {
