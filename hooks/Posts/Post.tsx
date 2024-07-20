@@ -14,7 +14,7 @@ export default class Post {
         this.content = content;
         this.url = url;
         this.date = date;
-        this.organization = this.organization
+        this.organization = organization
     }
 
     public getId() {

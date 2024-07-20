@@ -9,18 +9,17 @@ const getCurrentTime = () => {
   const seconds = now.getSeconds();
   return { hours, minutes, seconds };
 };
+
 const calculateTimes = (classTimes) => {
   const { hours: currentHours, minutes: currentMinutes, seconds: currentSeconds } = getCurrentTime();
   const currentTimeInSeconds = currentHours * 3600 + currentMinutes * 60 + currentSeconds;
 
-  let totalClassDuration = 0;
-  let totalBreakDuration = 0;
   let isClassOngoing = false;
   let remainingTime = 0;
   let elapsedTime = 0;
   let afterSchool = true;
-
-  let prevClassEndInSeconds = 0;
+  let totalClassDuration = 0;
+  let totalBreakDuration = 0;
 
   for (let i = 0; i < classTimes["classes"].length; i++) {
     const cls = classTimes["classes"][i];
@@ -29,40 +28,27 @@ const calculateTimes = (classTimes) => {
 
     const classStartInSeconds = startHours * 3600 + startMinutes * 60 + startSeconds;
     const classEndInSeconds = endHours * 3600 + endMinutes * 60 + endSeconds;
-    const classDuration = classEndInSeconds - classStartInSeconds;
-
-    if (i > 0) {
-      // Calculate break duration between the end of the previous class and the start of the current class
-      totalBreakDuration += Math.max(0, classStartInSeconds - prevClassEndInSeconds);
-    }
 
     if (currentTimeInSeconds >= classStartInSeconds && currentTimeInSeconds <= classEndInSeconds) {
-      const elapsedTimeInClass = currentTimeInSeconds - classStartInSeconds;
+      // Currently in a class
       remainingTime = classEndInSeconds - currentTimeInSeconds;
-      totalClassDuration = classEndInSeconds - classStartInSeconds; // Set to the duration of the ongoing class
+      totalClassDuration = classEndInSeconds - classStartInSeconds;
       isClassOngoing = true;
-      elapsedTime = elapsedTimeInClass;
+      elapsedTime = currentTimeInSeconds - classStartInSeconds;
       afterSchool = false;
       break;
     } else if (currentTimeInSeconds < classStartInSeconds) {
+      // Next class hasn't started yet
       remainingTime = classStartInSeconds - currentTimeInSeconds;
+      totalBreakDuration = remainingTime;
       afterSchool = false;
-    } else {
-      // Only accumulate totalClassDuration if class has ended but not if it is currently ongoing
-      if (!isClassOngoing) {
-        totalClassDuration += classDuration;
-      }
+      break;
     }
-
-    prevClassEndInSeconds = classEndInSeconds;
-  }
-
-  if (isClassOngoing) {
-    remainingTime = Math.max(remainingTime, 0);
   }
 
   return { remainingTime, isClassOngoing, totalClassDuration, elapsedTime, totalBreakDuration, afterSchool };
 };
+
 
 
 const ClassCountdown = ({ time }) => {
