@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import InfiniteCampus from '@/hooks/InfiniteCampus/InfiniteCampus';
 import Course from '@/hooks/InfiniteCampus/InfiniteCampusCourse';
 import ClassCountdown from '@/components/CountDownTimer';
 import formatTime from '@/constants/FormatTime';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import EncryptedStorage from 'react-native-encrypted-storage';
-import calculateTimes from '@/components/CountDownTimer'
-import {stripAfterAtSymbol} from '@/constants/utils';
+import makeUser from '@/hooks/InfiniteCampus/MakeUser';
 
 export default function ScheduleScreen() {
   const [uniqueCourses, setUniqueCourses] = useState([]);
@@ -20,9 +16,8 @@ export default function ScheduleScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let email = await AsyncStorage.getItem('IFEmail');
-        let password = await EncryptedStorage.getItem('IFPassword');
-        let user = new InfiniteCampus(stripAfterAtSymbol(email), password);
+        let user = await makeUser();
+
         await user.login();
         let courses = await getCourses(user);
 

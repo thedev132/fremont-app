@@ -1,8 +1,8 @@
 import getAllPosts from "@/hooks/Posts/getAllPosts";
 import Post from "@/hooks/Posts/Post";
 import React, { useEffect } from "react";
-import { View, Text, ActivityIndicator, FlatList, Dimensions, TouchableOpacity } from "react-native";
-import { Card, List } from "react-native-paper";
+import { View, Text, ActivityIndicator, FlatList, Dimensions, TouchableOpacity, RefreshControl } from "react-native";
+import { Card } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {formatDateMMDD} from "@/constants/FormatDate";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -11,17 +11,25 @@ export default function NotificationScreen({ navigation }) {
 
     const [posts, setPosts] = React.useState<Post[]>([]);
     const [loading, setLoading] = React.useState(false);
+    const [refreshing, setRefreshing] = React.useState(false);
+
+    // Fetch notifications
+    const fetchNotifications = async () => {
+      setLoading(true);
+      let postList = await getAllPosts();
+      setPosts(postList);
+      setLoading(false);
+    }
+
+    const reloadNotifications = async () => {
+      let postList = await getAllPosts();
+      setPosts(postList);
+      setRefreshing(false);
+    }
+  
 
     useEffect(() => {
-        // Fetch notifications
-        const fetchNotifications = async () => {
-            setLoading(true);
-            let postList = await getAllPosts();
-            setPosts(postList);
-            setLoading(false);
-        }
         fetchNotifications();
-
     }, []);
 
     if (loading) {
@@ -79,6 +87,10 @@ export default function NotificationScreen({ navigation }) {
             renderItem={renderItem}
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={{ padding: 10 }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={reloadNotifications} />
+            }
+            scrollEnabled={true}
           />
         </SafeAreaView>
       );

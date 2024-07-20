@@ -1,13 +1,12 @@
 import InfiniteCampus from '@/hooks/InfiniteCampus/InfiniteCampus';
 import Student from '@/hooks/InfiniteCampus/InfiniteCampusStudent';
 import { useEffect, useState } from 'react';
-import { Text, View, Image, StyleSheet } from 'react-native';
+import { Text, View, Image } from 'react-native';
 import { BarcodeCreatorView, BarcodeFormat } from "react-native-barcode-creator";
 import Divider from '@/components/Divider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import EncryptedStorage from 'react-native-encrypted-storage';
 import React from 'react';
-import {stripAfterAtSymbol} from '@/constants/utils';
+import makeUser from '@/hooks/InfiniteCampus/MakeUser';
 
 export default function IDCardScreen() {
     
@@ -15,13 +14,20 @@ export default function IDCardScreen() {
     useEffect(() => {
 
         const fetchData = async () => {
-            let email = await AsyncStorage.getItem('IFEmail');
-            let password = await EncryptedStorage.getItem('IFPassword');
-            let user = new InfiniteCampus(stripAfterAtSymbol(email), password);
+            let storedStudentInfo = await AsyncStorage.getItem('studentInfo');
+            if (storedStudentInfo !== null) {
+                let info = JSON.parse(storedStudentInfo);
+                let student = new Student(info['firstName'], info['lastName'], info['grade'], info['studentID'], info['profilePicture']);
+                setStudentInfo(student);
+            }
+            let user = await makeUser();
             user.login();
             try {
                 let student = await user.getStudentInfo();
-                setStudentInfo(student);
+                if (storedStudentInfo === null) {
+                    setStudentInfo(student);
+                }
+                await AsyncStorage.setItem('studentInfo', JSON.stringify(student));
             } catch (error) {
                 // Handle error
             }
