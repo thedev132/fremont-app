@@ -81,10 +81,10 @@ export default function ScheduleScreen() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#fff" />
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size='large' color='#BF1B1B'/>
       </View>
-    );
+    )
   }
 
   return (
