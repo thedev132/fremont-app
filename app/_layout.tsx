@@ -13,6 +13,7 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import UpdateExpoPushToken from '@/hooks/ServerAuth/UpdateExpoPushToken';
+import PostDetailView from './misc/PostDetailView';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -161,7 +162,12 @@ export default function RootLayout() {
           ...TransitionPresets.ModalSlideFromBottomIOS,
         }}>
        {loggedIn ? (
+          <Stack.Group>
             <Stack.Screen name="tabs" component={TabLayout} />
+              <Stack.Group screenOptions={{presentation: 'modal'}}>
+                <Stack.Screen options={({ route }) => ({ title: route.params.name, headerShown: true, headerTitleAlign: 'center', headerTintColor:'#fff', headerStyle: {backgroundColor:  '#8B0000' }})} name="misc/PostDetailView" component={PostDetailView} />
+              </Stack.Group> 
+          </Stack.Group>
         ) : (
           <Stack.Group>
             <Stack.Group>

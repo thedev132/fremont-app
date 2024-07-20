@@ -8,7 +8,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import IDCardScreen from './idCard';
 import ScheduleScreen from './schedule';
 import GradesScreen from './grades';
-import NotificationScreen from './notifications';
+import NotificationScreen from './posts';
 export default function TabLayout() {
   const Tabs = AnimatedTabBarNavigator();
 

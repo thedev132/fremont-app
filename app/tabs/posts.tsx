@@ -1,13 +1,13 @@
 import getAllPosts from "@/hooks/Posts/getAllPosts";
 import Post from "@/hooks/Posts/Post";
 import React, { useEffect } from "react";
-import { View, Text, ActivityIndicator, FlatList, Dimensions } from "react-native";
+import { View, Text, ActivityIndicator, FlatList, Dimensions, TouchableOpacity } from "react-native";
 import { Card, List } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {formatDateMMDD} from "@/constants/FormatDate";
 import { MaterialIcons } from "@expo/vector-icons";
 
-export default function NotificationScreen() {
+export default function NotificationScreen({ navigation }) {
 
     const [posts, setPosts] = React.useState<Post[]>([]);
     const [loading, setLoading] = React.useState(false);
@@ -51,16 +51,19 @@ export default function NotificationScreen() {
             shadowOpacity: 0.3,
             shadowRadius: 2,
           }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <MaterialIcons name="notifications" size={28} color="black" style={{ marginRight: 12 }} />
-              <View style={{ flex: 1 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                  <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.title}</Text>
-                  <Text style={{ fontSize: 12, color: '#555' }}>{formatDateMMDD(item.getDate() ?? '')}</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('misc/PostDetailView', { name: item.getTitle(), content: item.getContent(), date: item.getDate(), orgName: item.getOrganization()?.getName() })}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <MaterialIcons name="notifications" size={28} color="black" style={{ marginRight: 12 }} />
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
+                    <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.getTitle()}</Text>
+                    <Text style={{ fontSize: 12, color: '#555' }}>{formatDateMMDD(item.getDate() ?? '')}</Text>
+                  </View>
+                  <Text style={{ marginTop: 5 }}>{item.getOrganization()?.getName() ?? 'No Organization'}</Text>
                 </View>
-                <Text style={{ marginTop: 5 }}>{item.getOrganization()?.getName() ?? 'No Organization'}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
+
           </Card>
         );
       };

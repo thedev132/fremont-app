@@ -21,6 +21,9 @@ const calculateTimes = (classTimes) => {
   let totalClassDuration = 0;
   let totalBreakDuration = 0;
 
+  let prevClassEndInSeconds = 0;
+  let nextClassStartInSeconds = Infinity; // Initialize to a large value for the next class start time
+
   for (let i = 0; i < classTimes["classes"].length; i++) {
     const cls = classTimes["classes"][i];
     const [startHours, startMinutes, startSeconds] = cls["start"].split(':').map(Number);
@@ -28,22 +31,44 @@ const calculateTimes = (classTimes) => {
 
     const classStartInSeconds = startHours * 3600 + startMinutes * 60 + startSeconds;
     const classEndInSeconds = endHours * 3600 + endMinutes * 60 + endSeconds;
+    const classDuration = classEndInSeconds - classStartInSeconds;
+
+    // Calculate break duration between the end of the previous class and the start of the current class
+    if (i > 0) {
+      totalBreakDuration += Math.max(0, classStartInSeconds - prevClassEndInSeconds);
+    }
 
     if (currentTimeInSeconds >= classStartInSeconds && currentTimeInSeconds <= classEndInSeconds) {
-      // Currently in a class
+      // Ongoing class
+      const elapsedTimeInClass = currentTimeInSeconds - classStartInSeconds;
       remainingTime = classEndInSeconds - currentTimeInSeconds;
-      totalClassDuration = classEndInSeconds - classStartInSeconds;
+      totalClassDuration = classEndInSeconds - classStartInSeconds; // Duration of the ongoing class
       isClassOngoing = true;
-      elapsedTime = currentTimeInSeconds - classStartInSeconds;
-      afterSchool = false;
+      elapsedTime = elapsedTimeInClass;
+      afterSchool = false; // Class is ongoing, not after school
       break;
     } else if (currentTimeInSeconds < classStartInSeconds) {
-      // Next class hasn't started yet
-      remainingTime = classStartInSeconds - currentTimeInSeconds;
-      totalBreakDuration = remainingTime;
-      afterSchool = false;
-      break;
+      // Upcoming class
+      if (currentTimeInSeconds < nextClassStartInSeconds) {
+        nextClassStartInSeconds = classStartInSeconds; // Update next class start time
+      }
+      afterSchool = false; // There is an upcoming class, not after school
+    } else {
+      // Completed class
+      totalClassDuration += classDuration;
     }
+
+    prevClassEndInSeconds = classEndInSeconds;
+  }
+
+  // If current time is past the end of the last class and there are no ongoing or upcoming classes
+  if (!isClassOngoing && currentTimeInSeconds > prevClassEndInSeconds) {
+    afterSchool = true;
+  }
+
+  // Calculate remaining time until the next class if not after school
+  if (!isClassOngoing && !afterSchool) {
+    remainingTime = Math.max(0, nextClassStartInSeconds - currentTimeInSeconds);
   }
 
   return { remainingTime, isClassOngoing, totalClassDuration, elapsedTime, totalBreakDuration, afterSchool };
@@ -69,6 +94,7 @@ const ClassCountdown = ({ time }) => {
       setTotalClassDuration(totalClassDuration);
       setTotalBreakDuration(totalBreakDuration);
       setAfterSchool(afterSchool);
+      // console.log(totalClassDuration, remainingTime);
     }, 1000); // Update every second
 
     return () => clearInterval(interval);
