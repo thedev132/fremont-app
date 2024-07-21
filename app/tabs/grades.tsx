@@ -1,29 +1,63 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, View, Dimensions, StyleSheet } from 'react-native';
+import { ScrollView, Text, View, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import makeUser from '@/hooks/InfiniteCampus/MakeUser';
 import { DataTable } from 'react-native-paper';
+import { Dropdown } from 'react-native-element-dropdown';
+
+interface Grade {
+  taskName: string;
+  score: string;
+}
+
+interface Grades {
+  [subject: string]: Grade[];
+}
 
 export default function GradesScreen() {
-  const [grades, setGrades] = useState([]);
+  const [grades, setGrades] = useState<Grades>({});
+  const [selectedSubject, setSelectedSubject] = useState<string>('');
+  const [dropdownItems, setDropdownItems] = useState<Array<{ label: string; value: string }>>([]);
 
   useEffect(() => {
     const fetchGrades = async () => {
       let user = await makeUser();
-      let grades = await user.getGrades();
-      setGrades(grades);
+      let grades: Grades = await user.getGrades();
+
+      // Update the task names with "Semester Grade 1", "Semester Grade 2", etc.
+      Object.keys(grades).forEach(subject => {
+        let semesterGradeCount = 1;
+        grades[subject] = grades[subject].map(grade => {
+          if (grade.taskName.startsWith('Semester Grade')) {
+            grade.taskName = `Semester Grade ${semesterGradeCount}`;
+            semesterGradeCount++;
+          }
+          return grade;
+        });
+      });
+
+      // Filter out subjects containing "Team"
+      const filteredGrades = Object.fromEntries(
+        Object.entries(grades).filter(([subject]) => !subject.includes('Team'))
+      );
+
+      // Set the filtered grades and dropdown items
+      setGrades(filteredGrades);
+      const subjects = Object.keys(filteredGrades).map(subject => ({ label: subject, value: subject }));
+      setDropdownItems(subjects);
+      setSelectedSubject(subjects[0]?.value || ''); // Set the default selected subject if available
     };
     fetchGrades();
   }, []);
 
   const screenWidth = Dimensions.get('window').width;
 
-  const getChartData = (subjectGrades) => {
-    const labels = [];
-    const data = [];
-    
+  const getChartData = (subjectGrades: Grade[]) => {
+    const labels: string[] = [];
+    const data: number[] = [];
+
     subjectGrades.forEach(grade => {
-      let score = null;
+      let score: number | null = null;
       switch (grade.score) {
         case 'A+':
           score = 97;
@@ -70,7 +104,7 @@ export default function GradesScreen() {
       }
 
       if (score !== null) {
-        labels.push(grade.taskName.replace('Progress Grade', 'P').replace('Semester Grade', 'S'));
+        labels.push(grade.taskName.replace('Progress Grade', 'P'));
         data.push(score);
       }
     });
@@ -82,11 +116,10 @@ export default function GradesScreen() {
         { data: [50], withDots: false }, // Min value
         { data: [100], withDots: false } // Max value
       ],
-      
     };
   };
 
-  const formatYLabel = (value) => {
+  const formatYLabel = (value: number) => {
     if (value >= 97) return 'A+';
     if (value >= 93) return 'A';
     if (value >= 90) return 'A-';
@@ -104,13 +137,40 @@ export default function GradesScreen() {
 
   return (
     <ScrollView>
-      <View style={styles.container}>
-        <Text style={styles.title}>Grades</Text>
-        {Object.keys(grades).map(subject => (
-          <View key={subject} style={styles.chartContainer}>
-            <Text style={styles.subjectTitle}>{subject}</Text>
+      <View style={{ flex: 1, padding: 16 }}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center' }}>Grades</Text>
+        <Dropdown
+          data={dropdownItems}
+          labelField="label"
+          valueField="value"
+          placeholder="Select subject"
+          value={selectedSubject}
+          onChange={(item) => {
+            setSelectedSubject(item.value);
+          }}
+          style={{
+            marginVertical: 20,
+            height: 50,
+            backgroundColor: '#fafafa',
+            borderRadius: 8,
+            padding: 12,
+            borderWidth: 1,
+            borderColor: '#ccc',
+          }}
+          placeholderStyle={{
+            fontSize: 16,
+            color: '#333',
+          }}
+          selectedTextStyle={{
+            fontSize: 16,
+            color: '#333',
+          }}
+        />
+        {selectedSubject && grades[selectedSubject] && (
+          <View style={{ marginVertical: 20 }}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: 'center' }}>{selectedSubject}</Text>
             <LineChart
-              data={getChartData(grades[subject])}
+              data={getChartData(grades[selectedSubject])}
               width={screenWidth}
               height={220}
               yAxisLabel=""
@@ -131,15 +191,15 @@ export default function GradesScreen() {
               }}
               bezier
               formatYLabel={formatYLabel}
-              style={styles.chart}
+              style={{ marginVertical: 8, borderRadius: 16 }}
             />
-                        <DataTable style={{ marginTop: 16 }}>
+            <DataTable style={{ marginTop: 16 }}>
               <DataTable.Header>
                 <DataTable.Title>Task</DataTable.Title>
                 <DataTable.Title numeric>Score</DataTable.Title>
               </DataTable.Header>
-              {grades[subject].map((grade) => {
-                let score = null;
+              {grades[selectedSubject].map((grade) => {
+                let score: number | null = null;
                 switch (grade.score) {
                   case 'A+':
                     score = 97;
@@ -184,41 +244,18 @@ export default function GradesScreen() {
                     score = null; // Ignore other letters
                     break;
                 }
+                // Only return rows with valid scores
                 return score !== null ? (
                   <DataTable.Row key={grade.taskName}>
                     <DataTable.Cell>{grade.taskName}</DataTable.Cell>
-                    <DataTable.Cell numeric>{score}</DataTable.Cell>
+                    <DataTable.Cell numeric>{grade.score}</DataTable.Cell>
                   </DataTable.Row>
                 ) : null;
               })}
             </DataTable>
           </View>
-        ))}
+        )}
       </View>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  chartContainer: {
-    marginVertical: 20,
-  },
-  subjectTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  chart: {
-    marginVertical: 8,
-    borderRadius: 16,
-  }
-});
