@@ -3,7 +3,7 @@ import React from 'react';
 
 import { AnimatedTabBarNavigator } from "react-native-animated-nav-tab-bar";
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import IDCardScreen from './idCard';
 import ScheduleScreen from './schedule';
@@ -83,6 +83,7 @@ export default function TabLayout() {
             color={'black'}
             focused={focused} />
         )}}/>
+        
 
     </Tabs.Navigator>
   );

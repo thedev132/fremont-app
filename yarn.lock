@@ -7742,6 +7742,13 @@ react-native-async-storage@^0.0.1:
   resolved "https://registry.npmjs.org/react-native-async-storage/-/react-native-async-storage-0.0.1.tgz"
   integrity sha512-EwOIpNfwMiELMnS7HDzgyX2xO4TALK95O473Z6Kai5Il5j/03yTTErwMtvoYnA0OKUHd1R54ptmbbMukUH03Xg==
 
+react-native-auto-height-image@^3.2.4:
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/react-native-auto-height-image/-/react-native-auto-height-image-3.2.4.tgz#c7a95d4d9701055c680c8dc02076def1107f9522"
+  integrity sha512-PTVzLuYY4Q5IDAk0QmnSNK12VnUPlt+ZiEJUlo5JUiHverR5Lg386iHK7D2bVkTNo7SCahIPlWzdSuX5Col3XQ==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-native-barcode-creator@^0.1.7:
   version "0.1.7"
   resolved "https://registry.npmjs.org/react-native-barcode-creator/-/react-native-barcode-creator-0.1.7.tgz"

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Course from '@/hooks/InfiniteCampus/InfiniteCampusCourse';
 import ClassCountdown from '@/components/CountDownTimer';
 import formatTime from '@/constants/FormatTime';
 import makeUser from '@/hooks/InfiniteCampus/MakeUser';
+import Icon from '@expo/vector-icons/MaterialIcons'; // Or another icon set
 
-export default function ScheduleScreen() {
+export default function ScheduleScreen({navigation}) {
   const [uniqueCourses, setUniqueCourses] = useState([]);
   const [classTimes, setClassTimes] = useState({ classes: [] });
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true);
   const [isAfterSchool, setIsAfterSchool] = useState(false);
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,11 +33,11 @@ export default function ScheduleScreen() {
         }
         setClassTimes(newClassTimes);
 
-        setLoading(false); 
+        setLoading(false);
 
       } catch (error) {
         console.error('Error fetching data:', error);
-        setLoading(false); // Ensure loading is set to false on error
+        setLoading(false);
       }
     };
 
@@ -76,50 +76,62 @@ export default function ScheduleScreen() {
 
   if (loading) {
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size='large' color='#BF1B1B'/>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size='large' color='#BF1B1B' />
       </View>
     )
   }
 
   return (
-      <View style={{ alignItems: 'center', flex: 1, backgroundColor: '#fff' }}>
-        <SafeAreaView style={{ marginTop: 30, width: '100%', alignItems: 'center' }}>
-          <View style={{ marginBottom: 10 }}>
-              <ClassCountdown time={classTimes} />
-          </View>
-          <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%', marginBottom: 100 }}>
-            {uniqueCourses.map((course, index) => (
-              <View key={index} 
-              style={{ 
-                backgroundColor: '#8B0000', 
-                alignItems: 'flex-start', 
-                padding: 20, 
-                borderRadius: 15, 
-                margin: 6, 
-                marginHorizontal: 40, 
-                // // Shadow for iOS
-                // shadowColor: 'black', 
-                // shadowOffset: {width: 10, height: 10},
-                // shadowOpacity: 1, 
-                // shadowRadius: 3, 
-                // // Shadow for Android
-                // elevation: 2 
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
+        {/* Profile Icon */}
+        <View style={{ position: 'absolute', top: 50, right: 30 }}>
+          <TouchableOpacity onPress={() => navigation.navigate('misc/profile')}>
+            <Icon name="person" size={30} color="#8B0000" />  
+          </TouchableOpacity>
+        </View>
+        
+        <View style={{ marginTop: 30, marginBottom: 10 }}>
+          <ClassCountdown time={classTimes} />
+        </View>
+        <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%', marginBottom: 100 }}>
+          {uniqueCourses.map((course, index) => (
+            <View
+              key={index}
+              style={{
+                backgroundColor: '#8B0000',
+                alignItems: 'flex-start',
+                padding: 20,
+                borderRadius: 15,
+                margin: 6,
+                marginHorizontal: 40,
+                // Shadow for iOS
+                // shadowColor: 'black',
+                // shadowOffset: { width: 10, height: 10 },
+                // shadowOpacity: 1,
+                // shadowRadius: 3,
+                // Shadow for Android
+                // elevation: 2
               }}>
-                <Text style={{ color: '#fff' }}>{course.getName()}</Text>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between',  }}>
-                  {course.getStartTime() !== undefined && course.getEndTime() !== undefined && (
-                    <Text style={{ color: '#fff' }}>{formatTime(course.getStartTime())} - {formatTime(course.getEndTime())} </Text>
-                  )}
-                  <Text style={{ color: '#fff' }}>{course.getTeacherName().replace(/,/g, '').trim().split(/\s+/)[0]}</Text>
-                  {course.getRoom() !== undefined && (
-                    <Text style={{ color: '#fff' }}> • RM: {course.getRoom()}</Text>
-                  )}
-                </View>
+              <Text style={{ color: '#fff' }}>{course.getName()}</Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                {course.getStartTime() !== undefined && course.getEndTime() !== undefined && (
+                  <Text style={{ color: '#fff' }}>
+                    {formatTime(course.getStartTime())} - {formatTime(course.getEndTime())}
+                  </Text>
+                )}
+                <Text style={{ color: '#fff' }}>
+                  {course.getTeacherName().replace(/,/g, '').trim().split(/\s+/)[0]}
+                </Text>
+                {course.getRoom() !== undefined && (
+                  <Text style={{ color: '#fff' }}> • RM: {course.getRoom()}</Text>
+                )}
               </View>
-            ))}
-          </ScrollView>
-        </SafeAreaView>
-      </View>
+            </View>
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 }

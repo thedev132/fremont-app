@@ -104,7 +104,7 @@ export default function GradesScreen() {
       }
 
       if (score !== null) {
-        labels.push(grade.taskName.replace('Progress Grade', 'P'));
+        labels.push(grade.taskName.replace('Progress Grade', 'P').replace('Semester Grade', 'S'));
         data.push(score);
       }
     });
