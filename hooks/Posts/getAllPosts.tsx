@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Organization from "./Organization";
+import Organization from "./NestedOrganization";
 import Post from "./Post";
 
 export default async function getAllPosts() {

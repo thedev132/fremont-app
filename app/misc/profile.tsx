@@ -91,7 +91,7 @@ export default function ProfileScreen({navigation}) {
                 </TouchableOpacity>
 
 
-                <TouchableOpacity >
+                <TouchableOpacity onPress={SignOut}>
                     <View style={{backgroundColor: '#BF1B1B', padding: 15, marginTop: 50, paddingHorizontal: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center'}}>
                         <Text className='text-white text-xl ml-3 font-bold'>Sign Out</Text>
                     </View>

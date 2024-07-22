@@ -1,4 +1,4 @@
-import Organization from "./Organization";
+import Organization from "./NestedOrganization";
 
 export default class Post {
     private id: string | undefined;

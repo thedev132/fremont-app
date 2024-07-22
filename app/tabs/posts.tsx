@@ -81,6 +81,11 @@ export default function NotificationScreen({ navigation }) {
     
       return (
         <SafeAreaView style={{ flex: 1, alignItems: 'center', backgroundColor: '#f5f5f5' }}>
+        <View style={{ position: 'absolute', top: 50, right: 30 }}>
+          <TouchableOpacity onPress={() => navigation.navigate('misc/AddClub')}>
+             <MaterialIcons name="notification-add" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
         <Text className='text-3xl text-center font-bold mt-10'>Announcements</Text>
         <FlatList
             data={posts}

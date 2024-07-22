@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import EncryptedStorage from "react-native-encrypted-storage/lib/typescript/EncryptedStorage";
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 export default async function SignOut() {
     await AsyncStorage.removeItem('accessToken');

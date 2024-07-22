@@ -15,6 +15,7 @@ import * as Device from 'expo-device';
 import UpdateExpoPushToken from '@/hooks/ServerAuth/UpdateExpoPushToken';
 import PostDetailView from './misc/PostDetailView';
 import ProfileScreen from './misc/profile';
+import AddClubScreen from './misc/AddClub';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -168,6 +169,7 @@ export default function RootLayout() {
               <Stack.Group screenOptions={{presentation: 'modal'}}>
                 <Stack.Screen options={({ route }) => ({ title: route.params.name, headerShown: true, headerTitleAlign: 'center', headerTintColor:'#fff', headerStyle: {backgroundColor:  '#8B0000' }})} name="misc/PostDetailView" component={PostDetailView} />
                 <Stack.Screen name="misc/profile" component={ProfileScreen} options={{headerShown: true, headerTitle: '', headerTransparent: true}}/>
+                <Stack.Screen name="misc/AddClub" component={AddClubScreen} options={{headerShown: true, headerTitle: '', headerTransparent: true}}/>
               </Stack.Group> 
           </Stack.Group>
         ) : (
