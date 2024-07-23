@@ -1,4 +1,4 @@
-export default class Organization {
+export default class NestedOrganization {
     private id: string | undefined;
     private name: string | undefined;
     private type: string | undefined;

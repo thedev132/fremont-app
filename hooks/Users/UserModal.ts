@@ -1,16 +1,20 @@
+import Organization from "../Posts/NestedOrganization";
+
 export default class User {
     private firstName: string;
     private lastName: string;
     private pictureUrl: string;
     private email: string;
     private gradYear: number;
+    private orgs: Organization[] = [];
 
-    constructor(firstName: string, lastName: string, pictureUrl: string, email: string, gradYear: number) {
+    constructor(firstName: string, lastName: string, pictureUrl: string, email: string, gradYear: number, orgs: Organization[]) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.pictureUrl = pictureUrl;
         this.email = email;
         this.gradYear = gradYear;
+        this.orgs = orgs;
     }
 
     public getFirstName() {
@@ -35,6 +39,10 @@ export default class User {
 
     public getGradYear() {
         return this.gradYear;
+    }
+
+    public getOrgs() {
+        return this.orgs;
     }
 
 }

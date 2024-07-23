@@ -1,4 +1,4 @@
-import Organization from "./NestedOrganization";
+import NestedOrganization from "./NestedOrganization";
 
 export default class Post {
     private id: string | undefined;
@@ -6,9 +6,9 @@ export default class Post {
     private content: string | undefined;
     private url : string | undefined;
     private date: string | undefined;
-    private organization: Organization | undefined;
+    private organization: NestedOrganization | undefined;
 
-    constructor(id: string, title: string, content: string, url: string, date: string, organization: Organization) {
+    constructor(id: string, title: string, content: string, url: string, date: string, organization: NestedOrganization) {
         this.id = id;
         this.title = title;
         this.content = content;

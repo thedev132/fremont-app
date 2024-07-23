@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import User from "./UserModal";
+import NestedOrganization from "../Posts/NestedOrganization";
 
 export default async function getUserMe() {
     let accessToken = await AsyncStorage.getItem('accessToken');
@@ -11,6 +12,11 @@ export default async function getUserMe() {
         }
     });
     let data = await response.json();
-    let user = new User(data["first_name"], data["last_name"],  data["picture_url"], data["email"], data["grad_year"]);
+    let orgs: NestedOrganization[] = [];
+    for (let org of data["memberships"]) {
+        let organization = org["organization"];
+        orgs.push(new NestedOrganization(organization["id"], organization["name"], organization["type"]));
+    }
+    let user = new User(data["first_name"], data["last_name"],  data["picture_url"], data["email"], data["grad_year"], orgs);
     return user;
 }
