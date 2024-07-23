@@ -138,7 +138,7 @@ export default function GradesScreen() {
   return (
     <ScrollView>
       <View style={{ flex: 1, padding: 16 }}>
-        <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center' }}>Grades</Text>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center' }}></Text>
         <Dropdown
           data={dropdownItems}
           labelField="label"

@@ -52,7 +52,7 @@ export default function AddClubScreen({navigation}) {
             shadowOpacity: 0.3,
             shadowRadius: 2,
           }}>
-            <TouchableOpacity onPress={() => navigation.navigate('misc/ClubDetailView', { name: item.getName(), description: item.getDescription(), day: item.getDay(), time: item.getTime(), location: item.getLocation() })}>
+            <TouchableOpacity onPress={() => navigation.navigate('misc/ClubDetails', { name: item.getName(), description: item.getDescription(), day: item.getDay(), time: item.getTime(), location: item.getLocation() })}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.getName()}</Text>
                     <MaterialIcons name="person-add" size={24} color="black" style={{marginLeft: 'auto', marginRight: 5}}/>
@@ -87,6 +87,15 @@ export default function AddClubScreen({navigation}) {
                 })
             }
             </ScrollView>
+            {/* add pagination next and previous buttons */}
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%', paddingHorizontal: 20, marginBottom: 20}}>
+                <TouchableOpacity>
+                    <Text style={{fontSize: 16, color: '#BF1B1B'}}>Previous</Text>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <Text style={{fontSize: 16, color: '#BF1B1B'}}>Next</Text>
+                </TouchableOpacity>
+            </View>
         </SafeAreaView>
     )
 }
