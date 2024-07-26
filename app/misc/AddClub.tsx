@@ -19,129 +19,187 @@ export default function AddClubScreen({ navigation }) {
     const [allOrgs, setAllOrgs] = useState<Organization[]>([]); // Store all organizations here
 
     async function addClub(id: number, name: string, type: string) {
-        let accessToken = await AsyncStorage.getItem('accessToken');
-        const response = await fetch(`https://fremont-app-backend.vercel.app/api/users/me/orgs/`, {
-             "method": "POST",
-             headers: {
-                'Content-Type': 'application/json',
-                "Authorization": `Bearer ${accessToken}`, // Add this line for authorization
-            },
-            "body": `{\n    \"organization\": ${id}\n}`,
-        });
-        let data = await response.json();
-        if (data["organization"] != null) {
-            let newClub = new NestedOrganization(String(id), name, type);
-            setMyClubs((prevClubs) => [...prevClubs, newClub]);
-            setClubs((prevClubs) => prevClubs.filter(club => club.getId() !== String(id)));
-        }
-    }
-
-    async function removeClub(id: number, name: string, type: string) {
       try {
+        let newClub = new NestedOrganization(String(id), name, type);
+  
+        // Define a comparison function for sorting
+        const compareByName = (a, b) => a.name.localeCompare(b.name);
+
+        // Update the list of my clubs and sort it alphabetically
+        setMyClubs((prevClubs) => {
+            // Create a new list with the added club
+            const updatedClubs = [...prevClubs, newClub];
+            
+            // Sort the list alphabetically by name
+            return updatedClubs.sort(compareByName);
+        });
+
+        // update the list of other clubs as needed
+        setClubs((prevClubs) => prevClubs.filter(club => {
+          if (club.getId() != String(id)) {
+            return club;
+          }
+      }));
+
           let accessToken = await AsyncStorage.getItem('accessToken');
-          const response = await fetch(`https://fremont-app-backend.vercel.app/api/users/me/orgs/${id}/`, {
-            "method": "DELETE",
-            headers: {
-                "Authorization": `Bearer ${accessToken}`, // Authorization header
-            },
+          const response = await fetch(`https://fremont-app-backend.vercel.app/api/users/me/orgs/`, {
+              method: "POST",
+              headers: {
+                  'Content-Type': 'application/json',
+                  "Authorization": `Bearer ${accessToken}`, // Add this line for authorization
+              },
+              body: JSON.stringify({ organization: id }),
           });
   
-          if (response.ok) {
-              // Remove the club from the list of my clubs
-              setMyClubs((prevClubs) => prevClubs.filter(club => club.getId() !== String(id)));
-  
-              // Add the removed club back to the list of other clubs
-              let newClub = new Organization(String(id), name, type, "fetch", "fetch", "fetch", "fetch");
-              setClubs((prevClubs) => [...prevClubs, newClub]);
-          } else {
-              console.error('No organization data found in response');
-          }
       } catch (error) {
-          console.error('Error removing club:', error);
+          console.error('Error adding club:', error);
       }
   }
   
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                let storedMyOrgs = await AsyncStorage.getItem('myOrgs');
-                if (storedMyOrgs != null) {
-                    let json = JSON.parse(storedMyOrgs);
-                    setMyClubs(json.map((org: any) => new NestedOrganization(org.id, org.name, org.type)));
-                }
-                else {
-                  let me = await getUserMe();
-                  let myOrgs = me.getOrgs();
-                  await AsyncStorage.setItem('myOrgs', JSON.stringify(myOrgs));
-                  setMyClubs(myOrgs);
-                }
+  async function removeClub(id: number, name: string, type: string) {
+    try {
+        setMyClubs((prevClubs) => prevClubs.filter(club => club.getId() != String(id)));
 
-                let storedOtherOrgs = await AsyncStorage.getItem('orgs');
-                
-                let orgs: Organization[] = [];
-                if (storedOtherOrgs != null) {
-                    let json = JSON.parse(storedOtherOrgs);
-                    orgs = json.map((org: any) => new Organization(org.id, org.name, org.type, org.day, org.location, org.time, org.description));
-                } else {
-                    orgs = await getAllOrganizations(1);
-                    await AsyncStorage.setItem('orgs', JSON.stringify(orgs));
-                }
-                setAllOrgs(orgs);
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching organizations:', error);
-                setLoading(false);
-            }
-        };
+        // Add the removed club back to the list of other clubs
+        let newClub = new Organization(String(id), name, type, "fetch", "fetch", "fetch", "fetch");
 
-        const updateData = async () => {
-            try {
+        // Define a comparison function for sorting
+        const compareByName = (a, b) => a.name.localeCompare(b.name);
+
+        // Update the clubs list and sort it alphabetically
+        setClubs((prevClubs) => {
+            // Create a new list with the added club
+            const updatedClubs = [...prevClubs, newClub];
+            
+            // Sort the list alphabetically by name
+            return updatedClubs.sort(compareByName);
+        });
+        let me = await getUserMe();
+        let myOrgs = me.getOrgs();
+        await AsyncStorage.setItem('myOrgs', JSON.stringify(myOrgs.sort(compareByName)));
+
+        let orgs: Organization[] = [];
+        orgs = await getAllOrganizations(1);
+        // Sort orgs alphabetically by name
+        orgs = orgs.sort(compareByName);
+        await AsyncStorage.setItem('orgs', JSON.stringify(orgs));
+
+        let accessToken = await AsyncStorage.getItem('accessToken');
+        const response = await fetch(`https://fremont-app-backend.vercel.app/api/users/me/orgs/${id}/`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`, // Authorization header
+            },
+        });
+
+    } catch (error) {
+        console.error('Error removing club:', error);
+    }
+}
+
+
+const compareByName = (a, b) => a.name.localeCompare(b.name);
+
+useEffect(() => {
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+
+            // Fetch and set my clubs
+            let storedMyOrgs = await AsyncStorage.getItem('myOrgs');
+            if (storedMyOrgs != null) {
+                let json = JSON.parse(storedMyOrgs);
+                let myClubs = json.map((org: any) => new NestedOrganization(org.id, org.name, org.type));
+                // Sort myClubs alphabetically by name
+                myClubs = myClubs.sort(compareByName);
+                setMyClubs(myClubs);
+            } else {
                 let me = await getUserMe();
                 let myOrgs = me.getOrgs();
                 await AsyncStorage.setItem('myOrgs', JSON.stringify(myOrgs));
+                // Sort myOrgs alphabetically by name
+                myOrgs = myOrgs.sort(compareByName);
                 setMyClubs(myOrgs);
-                let orgs: Organization[] = [];
-                orgs = await getAllOrganizations(1);
-                await AsyncStorage.setItem('orgs', JSON.stringify(orgs));
-                setAllOrgs(orgs);
-            } catch (error) {
-                console.error('Error updating organizations:', error);
             }
+
+            // Fetch and set other organizations
+            let storedOtherOrgs = await AsyncStorage.getItem('orgs');
+            let orgs: Organization[] = [];
+            if (storedOtherOrgs != null) {
+                let json = JSON.parse(storedOtherOrgs);
+                orgs = json.map((org: any) => new Organization(org.id, org.name, org.type, org.day, org.location, org.time, org.description));
+                // Sort orgs alphabetically by name
+                orgs = orgs.sort(compareByName);
+            } else {
+                orgs = await getAllOrganizations(1);
+                // Sort orgs alphabetically by name
+                orgs = orgs.sort(compareByName);
+                await AsyncStorage.setItem('orgs', JSON.stringify(orgs));
+
+            }
+            setAllOrgs(orgs);
+
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching organizations:', error);
+            setLoading(false);
         }
-        fetchData();
-        updateData();
-    }, []);
+    };
+
+    const updateData = async () => {
+        try {
+            let me = await getUserMe();
+            let myOrgs = me.getOrgs();
+            await AsyncStorage.setItem('myOrgs', JSON.stringify(myOrgs));
+            // Sort myOrgs alphabetically by name
+            myOrgs = myOrgs.sort(compareByName);
+            setMyClubs(myOrgs);
+
+            let orgs = await getAllOrganizations(1);
+            await AsyncStorage.setItem('orgs', JSON.stringify(orgs));
+            // Sort orgs alphabetically by name
+            orgs = orgs.sort(compareByName);
+            setAllOrgs(orgs);
+        } catch (error) {
+            console.error('Error updating organizations:', error);
+        }
+    };
+
+    fetchData();
+    updateData();
+}, []);
 
     useEffect(() => {
         const filterClubs = () => {
-            const myClubIds = new Set(myClubs.map(club => club.getId()));
-            const filteredClubs = allOrgs.filter(club => !myClubIds.has(club.getId()));
+            const myClubIds = new Set(myClubs.map(club => Number(club.getId())));
+            const filteredClubs = allOrgs.filter(club => !myClubIds.has(Number(club.getId())));
             setClubs(filteredClubs);
         };
         filterClubs();
     }, [myClubs, allOrgs]);
 
     const loadMoreData = async () => {
-        if (loadingMore || noMoreData) return;
-
-        setLoadingMore(true);
-        try {
-            let newOrgs = await getAllOrganizations(page + 1);
-            if (newOrgs.length === 0) {
-                setNoMoreData(true);
-            } else {
-                setAllOrgs((prevOrgs) => [...prevOrgs, ...newOrgs]);
-                setPage(prevPage => prevPage + 1);
-            }
-        } catch (error) {
-            console.error('Error loading more organizations:', error);
-            setNoMoreData(true);
-        }
-        setLoadingMore(false);
-    };
-
+      if (loadingMore || noMoreData) return;
+  
+      setLoadingMore(true);
+      try {
+          let newOrgs = await getAllOrganizations(page + 1);
+        // Append newOrgs to existing organizations
+        let prevOrgs = allOrgs;
+        setAllOrgs(_ => {
+            const updatedOrgs = [...prevOrgs, ...newOrgs];
+            return updatedOrgs;
+        });
+  
+          setPage(prevPage => prevPage + 1);
+      } catch (error) {
+          console.log('Error loading more organizations:', error);
+          setNoMoreData(true);
+      }
+      setLoadingMore(false);
+  };
+  
     const renderItem = ({ item }: { item: Organization }) => {
         const screenWidth = Dimensions.get('window').width;
 
@@ -214,6 +272,11 @@ export default function AddClubScreen({ navigation }) {
             </Card>
         );
     };
+    const renderFooter = () => {
+      if (!loadingMore) return null;
+      return <ActivityIndicator size='large' color='#BF1B1B' style={{ marginVertical: 20 }} />;
+    };
+
 
     if (loading) {
         return (
@@ -251,6 +314,7 @@ export default function AddClubScreen({ navigation }) {
                     style={{ flex: 1, width: '100%' }}
                     onEndReached={loadMoreData}
                     onEndReachedThreshold={0.5}
+                    ListFooterComponent={renderFooter}
                 />
             </View>
           </ScrollView>

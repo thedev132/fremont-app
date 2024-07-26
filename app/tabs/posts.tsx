@@ -6,6 +6,7 @@ import { Card } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {formatDateMMDD} from "@/constants/FormatDate";
 import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function NotificationScreen({ navigation }) {
 
@@ -15,10 +16,17 @@ export default function NotificationScreen({ navigation }) {
 
     // Fetch notifications
     const fetchNotifications = async () => {
-      setLoading(true);
-      let postList = await getAllPosts();
-      setPosts(postList);
-      setLoading(false);
+      let storedPosts = await AsyncStorage.getItem('posts');
+      if (storedPosts != null) {
+        let postList = JSON.parse(storedPosts);
+        setPosts(postList);
+      }
+      else {
+        setLoading(true);
+        let postList = await getAllPosts();
+        setPosts(postList);
+        setLoading(false);
+      }
     }
 
     const reloadNotifications = async () => {
@@ -30,6 +38,7 @@ export default function NotificationScreen({ navigation }) {
 
     useEffect(() => {
         fetchNotifications();
+        reloadNotifications();
     }, []);
 
     if (loading) {
