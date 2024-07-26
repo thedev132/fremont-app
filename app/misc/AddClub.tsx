@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, useEffect } from "react";
 import { View, Text, Dimensions, TouchableOpacity, SafeAreaView, ActivityIndicator } from "react-native";
 import { Card } from "react-native-paper";
-import { FlatList } from 'react-native-gesture-handler';
+import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import getUserMe from "@/hooks/Users/Users";
 import NestedOrganization from "@/hooks/Posts/NestedOrganization";
 
@@ -19,9 +19,6 @@ export default function AddClubScreen({ navigation }) {
     const [allOrgs, setAllOrgs] = useState<Organization[]>([]); // Store all organizations here
 
     async function addClub(id: number, name: string, type: string) {
-        // Add club to user's clubs
-        // Update myClubs state
-        // Update clubs state
         let accessToken = await AsyncStorage.getItem('accessToken');
         const response = await fetch(`https://fremont-app-backend.vercel.app/api/users/me/orgs/`, {
              "method": "POST",
@@ -38,6 +35,32 @@ export default function AddClubScreen({ navigation }) {
             setClubs((prevClubs) => prevClubs.filter(club => club.getId() !== String(id)));
         }
     }
+
+    async function removeClub(id: number, name: string, type: string) {
+      try {
+          let accessToken = await AsyncStorage.getItem('accessToken');
+          const response = await fetch(`https://fremont-app-backend.vercel.app/api/users/me/orgs/${id}/`, {
+            "method": "DELETE",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`, // Authorization header
+            },
+          });
+  
+          if (response.ok) {
+              // Remove the club from the list of my clubs
+              setMyClubs((prevClubs) => prevClubs.filter(club => club.getId() !== String(id)));
+  
+              // Add the removed club back to the list of other clubs
+              let newClub = new Organization(String(id), name, type, "fetch", "fetch", "fetch", "fetch");
+              setClubs((prevClubs) => [...prevClubs, newClub]);
+          } else {
+              console.error('No organization data found in response');
+          }
+      } catch (error) {
+          console.error('Error removing club:', error);
+      }
+  }
+  
 
     useEffect(() => {
         const fetchData = async () => {
@@ -182,7 +205,7 @@ export default function AddClubScreen({ navigation }) {
                 })}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'nowrap' }}>
                         <Text style={{ fontSize: 16, fontWeight: 'bold', flexShrink: 1}} numberOfLines={1}>{item.getName()}</Text>
-                        <TouchableOpacity style={{ marginLeft: 'auto', marginRight: 5 }}>
+                        <TouchableOpacity onPress={() => removeClub(parseInt(item.getId()), item.getName(), item.getType())} style={{ marginLeft: 'auto', marginRight: 5 }}>
                             <MaterialIcons name="person-remove" size={24} color="black" />
                         </TouchableOpacity>
                         <MaterialIcons name="arrow-forward-ios" size={20} color="black" />
@@ -190,11 +213,6 @@ export default function AddClubScreen({ navigation }) {
                 </TouchableOpacity>
             </Card>
         );
-    };
-
-    const renderFooter = () => {
-        if (!loadingMore) return null;
-        return <ActivityIndicator size='large' color='#BF1B1B' style={{ marginVertical: 20 }} />;
     };
 
     if (loading) {
@@ -207,6 +225,7 @@ export default function AddClubScreen({ navigation }) {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+          <ScrollView showsVerticalScrollIndicator={false} >
             <View style={{ flex: 1, alignItems: 'center' }}>
                 <Text style={{ fontSize: 24, fontWeight: 'bold', marginTop: 70, marginBottom: 10, textAlign: 'center' }}>My Clubs</Text>
 
@@ -232,9 +251,9 @@ export default function AddClubScreen({ navigation }) {
                     style={{ flex: 1, width: '100%' }}
                     onEndReached={loadMoreData}
                     onEndReachedThreshold={0.5}
-                    ListFooterComponent={renderFooter}
                 />
             </View>
+          </ScrollView>
         </SafeAreaView>
     );
 }
