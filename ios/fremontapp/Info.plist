@@ -27,8 +27,14 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>myapp</string>
-          <string>com.fhs.fremontapp</string>
+          <string>fhs</string>
+          <string>org.fuhsd.fhs.app</string>
+        </array>
+      </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>exp+fremont-app</string>
         </array>
       </dict>
     </array>
@@ -46,6 +52,10 @@
     <key>NSUserActivityTypes</key>
     <array>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
+    </array>
+    <key>UIAppFonts</key>
+    <array>
+      <string>Inter-Bold.ttf</string>
     </array>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
