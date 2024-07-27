@@ -35,6 +35,7 @@ export default function ConnectIFScreen({loggedIn, setLoggedIn}) {
                     placeholder='Email'
                     cursorColor='#BF1B1B'
                     selectionColor='#BF1B1B'
+                    autoCapitalize='none'
                 />
                 <TextInput
                 mode='outlined'
@@ -46,6 +47,7 @@ export default function ConnectIFScreen({loggedIn, setLoggedIn}) {
                 placeholder='Password'
                 cursorColor='#BF1B1B'
                 selectionColor='#BF1B1B'
+                autoCapitalize='none'
                 />
                 <TouchableOpacity onPress={connect}>
                     <View style={{backgroundColor: '#BF1B1B', padding: 15, paddingHorizontal: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center'}}>
