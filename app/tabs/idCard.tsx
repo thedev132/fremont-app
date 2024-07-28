@@ -37,7 +37,7 @@ export default function IDCardScreen() {
     }, []);
 
     return (
-        <View style={{flex:1, alignItems: 'center', justifyContent: 'center'}}>
+        <View style={{flex:1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff'}}>
             <View style={{alignItems: 'center', marginBottom: 30}}>
                 <Image style={{width: 100, height: 150, marginBottom: 20}} source={{uri: studentInfo?.getProfilePicture()}} />
                 <Text style={{color: 'black', fontSize: 32}}> {studentInfo?.getFullName()} </Text>

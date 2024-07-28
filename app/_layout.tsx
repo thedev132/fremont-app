@@ -163,6 +163,7 @@ export default function RootLayout() {
           headerShown: false,
           gestureEnabled: true,
           ...TransitionPresets.ModalSlideFromBottomIOS,
+          headerBackTitle: ''
         }}>
        {loggedIn ? (
           <Stack.Group>

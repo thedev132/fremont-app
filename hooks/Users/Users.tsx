@@ -12,6 +12,7 @@ export default async function getUserMe() {
         }
     });
     let data = await response.json();
+    console.log(data)
     let orgs: NestedOrganization[] = [];
     for (let org of data["memberships"]) {
         let organization = org["organization"];

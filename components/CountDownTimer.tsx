@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
-import { Text } from 'react-native';
+import { Dimensions, Text } from 'react-native';
 
 const getCurrentTimeInSeconds = () => {
   const now = new Date();
@@ -51,6 +51,7 @@ const calculateTimes = (classTimes) => {
   };
 };
 
+const { width, height } = Dimensions.get('window');
 
 const ClassCountdown = ({ time }) => {
   const initialCalculation = calculateTimes(time);
@@ -75,21 +76,24 @@ const ClassCountdown = ({ time }) => {
     return () => clearInterval(interval);
   }, [time]);
 
+  // Smaller responsive size and fontSize
+  const timerSize = width > 350 ? 200 : width * 0.5;
+  const fontSize = width > 350 ? 24 : 16;
+
   return (
     <CountdownCircleTimer
       isPlaying={true}
-      duration={isClassOngoing ? totalClassDuration : breakDuration} // Use totalClassDuration for ongoing classes
+      duration={isClassOngoing ? totalClassDuration : breakDuration}
       initialRemainingTime={isClassOngoing ? currentClassRemainingTime : nextClassRemainingTime}
       colors={['#8B0000', '#8B0000']}
       colorsTime={[0, 0]}
-      size={250}
-      strokeWidth={16}
-      trailStrokeWidth={15}
+      size={timerSize}
+      strokeWidth={timerSize * 0.064} // 16/250 ratio for different sizes
+      trailStrokeWidth={timerSize * 0.06} // 15/250 ratio for different sizes
       trailColor="rgba(233, 233, 233, 1)"
     >
-
       {() => (
-        <Text style={{ color: '#000', fontSize: 30, fontWeight: 'bold', textAlign: 'center', fontFamily: 'Inter-Bold' }}>
+        <Text style={{ color: '#000', fontSize: fontSize, fontWeight: 'bold', textAlign: 'center', fontFamily: 'Inter-Bold' }}>
           {afterSchool
             ? "After School"
             : isClassOngoing
