@@ -32,7 +32,7 @@ export default function TabLayout() {
               color={'black'}
               focused={focused} />
         )}} />
-      <Tabs.Screen name='Announcements' component={NotificationScreen} options={{
+      <Tabs.Screen name='Reminders' component={NotificationScreen} options={{
         tabBarIcon: ({ focused, color, size }) => (
           focused ? 
             <Ionicons

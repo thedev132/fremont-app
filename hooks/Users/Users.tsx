@@ -4,7 +4,7 @@ import NestedOrganization from "../Posts/NestedOrganization";
 
 export default async function getUserMe() {
     let accessToken = await AsyncStorage.getItem('accessToken');
-    const response = await fetch('https://fremont-app-backend.vercel.app/api/users/me', {
+    const response = await fetch('https://fremont-app-backend.vercel.app/api/users/me/', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -12,6 +12,7 @@ export default async function getUserMe() {
         }
     });
     let data = await response.json();
+    console.log(data)
     let orgs: NestedOrganization[] = [];
     for (let org of data["memberships"]) {
         let organization = org["organization"];

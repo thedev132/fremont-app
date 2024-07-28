@@ -108,6 +108,7 @@ useEffect(() => {
 
             // Fetch and set my clubs
             let storedMyOrgs = await AsyncStorage.getItem('myOrgs');
+            console.log(storedMyOrgs)
             if (storedMyOrgs != null) {
                 let json = JSON.parse(storedMyOrgs);
                 let myClubs = json.map((org: any) => new NestedOrganization(org.id, org.name, org.type));
@@ -115,12 +116,14 @@ useEffect(() => {
                 myClubs = myClubs.sort(compareByName);
                 setMyClubs(myClubs);
             } else {
+                console.log("fetching")
                 let me = await getUserMe();
                 let myOrgs = me.getOrgs();
                 await AsyncStorage.setItem('myOrgs', JSON.stringify(myOrgs));
                 // Sort myOrgs alphabetically by name
                 myOrgs = myOrgs.sort(compareByName);
                 setMyClubs(myOrgs);
+                console.log("finished")
             }
 
             // Fetch and set other organizations
@@ -166,7 +169,7 @@ useEffect(() => {
         }
     };
 
-    fetchData();
+    fetchData()
     updateData();
 }, []);
 

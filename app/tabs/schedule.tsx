@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Course from '@/hooks/InfiniteCampus/InfiniteCampusCourse';
 import ClassCountdown from '@/components/CountDownTimer';
@@ -12,6 +12,7 @@ export default function ScheduleScreen({navigation}) {
   const [classTimes, setClassTimes] = useState({ classes: [] });
   const [loading, setLoading] = useState(true);
   const [isAfterSchool, setIsAfterSchool] = useState(false);
+  const { width, height } = Dimensions.get('window');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -82,15 +83,16 @@ export default function ScheduleScreen({navigation}) {
     )
   }
 
+  const iconSize = width > 350 ? 30 : 24; // Adjust size based on screen width
+
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
-        {/* Profile Icon */}
-        <View style={{ position: 'absolute', top: 50, right: 30 }}>
-          <TouchableOpacity onPress={() => navigation.navigate('misc/profile')}>
-            <Icon name="person" size={30} color="#8B0000" />  
-          </TouchableOpacity>
-        </View>
+      <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08 }}>
+        <TouchableOpacity onPress={() => navigation.navigate('misc/profile')}>
+          <Icon name="person" size={iconSize} color="#8B0000" />  
+        </TouchableOpacity>
+      </View>
         
         <View style={{ marginTop: 30, marginBottom: 10 }}>
           <ClassCountdown time={classTimes} />
