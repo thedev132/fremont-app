@@ -9,7 +9,7 @@ import { Feather } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SignOut from "@/hooks/ServerAuth/SignOut";
 
-export default function ProfileScreen({navigation}) {
+export default function ProfileScreen({ navigation, setLoggedIn }) {
 
     const [me, setMe] = React.useState<User | null>();
     const [loading, setLoading] = React.useState(false);
@@ -35,6 +35,12 @@ export default function ProfileScreen({navigation}) {
         }
         fetchData();
     }, [])
+
+    function handleSignOut() {
+        SignOut();
+        setLoggedIn(false);
+    }
+
 
     if (loading) {
         return (
@@ -91,7 +97,7 @@ export default function ProfileScreen({navigation}) {
                 </TouchableOpacity>
 
 
-                <TouchableOpacity onPress={SignOut}>
+                <TouchableOpacity onPress={handleSignOut}>
                     <View style={{backgroundColor: '#BF1B1B', padding: 15, marginTop: 50, paddingHorizontal: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center'}}>
                         <Text className='text-white text-xl ml-3 font-bold'>Sign Out</Text>
                     </View>

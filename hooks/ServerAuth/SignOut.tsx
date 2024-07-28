@@ -9,4 +9,8 @@ export default async function SignOut() {
     await AsyncStorage.removeItem('IFEmail');
     await EncryptedStorage.removeItem('IFPassword');
     await AsyncStorage.removeItem('orgs');
+    await AsyncStorage.removeItem('posts');
+    await AsyncStorage.removeItem('studentInfo');
+    await AsyncStorage.removeItem('myOrgs');
+    
 }
