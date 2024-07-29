@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "fremont-app",
+    "name": "Fremont",
     "slug": "fremont-app",
     "owner": "mmortada685",
     "version": "1.0.0",
@@ -9,9 +9,9 @@
     "scheme": "fhs",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/adaptive-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#f8f8f8"
     },
     "ios": {
       "supportsTablet": true,
@@ -19,8 +19,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#fff"
       },
       "package": "org.fuhsd.fhs.app",
       "googleServicesFile": "./google-services.json"

@@ -1,4 +1,4 @@
-rootProject.name = 'fremont-app'
+rootProject.name = 'Fremont'
 
 dependencyResolutionManagement {
   versionCatalogs {
