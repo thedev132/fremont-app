@@ -3,6 +3,9 @@ import { View, Text, ScrollView } from "react-native";
 import { formatDate } from "@/constants/FormatDate";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Divider from "@/components/Divider";
+import Markdown from "react-native-markdown-display";
+import markdownStyles from "@/constants/markdownStyles";
+import tw from "twrnc";
 
 export default function PostDetailView({ route, navigation }) {
     const { name, content, date, orgName } = route.params;
@@ -16,8 +19,10 @@ export default function PostDetailView({ route, navigation }) {
             </View>
             <Divider />
             <View style={{ marginTop: 8 }}>
-                <Text style={{ fontSize: 16, lineHeight: 24, color: '#333' }}>{content}</Text>
-            </View>
+            <ScrollView>
+                <Markdown style={markdownStyles}>{content}</Markdown>
+            </ScrollView>  
+          </View>
         </SafeAreaView>
     );
 }

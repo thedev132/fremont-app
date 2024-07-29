@@ -25,11 +25,6 @@
       "package": "org.fuhsd.fhs.app",
       "googleServicesFile": "./google-services.json"
     },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
     "plugins": [
       "expo-router",
       [
@@ -40,10 +35,10 @@
       ],
       [
         "expo-notifications",
-      {
-        "icon": "./assets/images/icon.png",
-        "color": "#ffffff"
-      }
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#ffffff"
+        }
       ]
     ],
     "experiments": {

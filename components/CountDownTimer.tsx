@@ -76,9 +76,11 @@ const ClassCountdown = ({ time }) => {
     return () => clearInterval(interval);
   }, [time]);
 
-  // Smaller responsive size and fontSize
-  const timerSize = width > 350 ? 200 : width * 0.5;
-  const fontSize = width > 350 ? 24 : 16;
+  // responsive size and fontSize
+  const timerSize = width > 350 ? width * 0.6 : width * 0.8;
+  const baseFontSize = width > 350 ? width * 0.06 : width * 0.08;
+  const largeFontSize = baseFontSize * 1.2; // Increase the font size for the countdown display
+
 
   return (
     <CountdownCircleTimer
@@ -93,7 +95,13 @@ const ClassCountdown = ({ time }) => {
       trailColor="rgba(233, 233, 233, 1)"
     >
       {() => (
-        <Text style={{ color: '#000', fontSize: fontSize, fontWeight: 'bold', textAlign: 'center', fontFamily: 'Inter-Bold' }}>
+        <Text style={{ 
+          color: '#000', 
+          fontSize: afterSchool || isClassOngoing ? largeFontSize : baseFontSize, 
+          fontWeight: 'bold', 
+          textAlign: 'center', 
+          fontFamily: 'Inter-Bold' 
+        }}>
           {afterSchool
             ? "After School"
             : isClassOngoing

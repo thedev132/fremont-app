@@ -39,6 +39,7 @@
     "nativewind": "^2.0.11",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-flatten-children": "^1.1.2",
     "react-native": "0.74.3",
     "react-native-animated-nav-tab-bar": "^3.1.10",
     "react-native-async-storage": "^0.0.1",
@@ -49,6 +50,7 @@
     "react-native-element-dropdown": "^2.12.1",
     "react-native-encrypted-storage": "^4.0.3",
     "react-native-gesture-handler": "~2.16.1",
+    "react-native-markdown-display": "^7.0.2",
     "react-native-pager-view": "^6.3.3",
     "react-native-paper": "^5.12.3",
     "react-native-reanimated": "~3.10.1",
@@ -58,7 +60,8 @@
     "react-native-svg": "^15.3.0",
     "react-native-tab-view": "^3.5.2",
     "react-native-web": "~0.19.10",
-    "styled-components": "^6.1.12"
+    "styled-components": "^6.1.12",
+    "twrnc": "^4.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

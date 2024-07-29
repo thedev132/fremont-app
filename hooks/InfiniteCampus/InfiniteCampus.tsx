@@ -22,7 +22,6 @@ export default class InfiniteCampus {
               credentials: 'include'
             });
             let result = await response.text()
-            console.log("\"" + result + "\"")
             if (result == "password-error") {
               return "password"
             }
@@ -75,7 +74,6 @@ export default class InfiniteCampus {
               method: 'GET',
             });
             let data = await response.json();
-            console.log(data)
             let calendarID = data[0]['calendarID']
 
             const responseDay = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/calendar/instructionalDay?calendarID=${calendarID}&date=${date}`, {

@@ -34,7 +34,6 @@ export default function LoginScreen({ navigation }) {
 
   const handleGoogleLoginPress = async () => {
     try {
-      setLoading(true);
       const response = await fetch('https://fremont-app-backend.vercel.app/api/auth/o/google/?redirect_uri=https%3A%2F%2Ffremont-app-backend.vercel.app%2Fredirect', { cache: "no-store" });
       const data = await response.json();
       const url = data["authorization_url"];
