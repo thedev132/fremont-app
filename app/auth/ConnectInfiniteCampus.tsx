@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Text, View, TouchableOpacity } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 import EncryptedStorage from 'react-native-encrypted-storage';
+import makeUser from '@/hooks/InfiniteCampus/MakeUser';
 
 export default function ConnectIFScreen({loggedIn, setLoggedIn}) {
     const [email, setEmail] = useState('');
@@ -15,7 +16,23 @@ export default function ConnectIFScreen({loggedIn, setLoggedIn}) {
             await AsyncStorage.setItem('IFEmail', email);
             await EncryptedStorage.setItem('IFPassword', password);
             await AsyncStorage.setItem('loggedIn', 'true');
-            setLoggedIn(true);
+            let user = await makeUser();
+            let result = await user.login();
+            if (result == "password") {
+                alert("invalid password")
+                return
+            }
+            else if (result == "captcha") {
+                alert("Needs captcha")
+                return
+            }
+            else if (result == "success") {
+                setLoggedIn(true);
+            }
+            else {
+                alert("Invalid credentials")
+                return
+            }
 
         } catch (error) {
             console.error('Error storing credentials:', error);

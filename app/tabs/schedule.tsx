@@ -18,8 +18,8 @@ export default function ScheduleScreen({navigation}) {
     const fetchData = async () => {
       try {
         let user = await makeUser();
-
         await user.login();
+        
         let courses = await getCourses(user);
 
         setUniqueCourses(courses);

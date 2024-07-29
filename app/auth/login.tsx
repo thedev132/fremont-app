@@ -39,9 +39,12 @@ export default function LoginScreen({ navigation }) {
       const data = await response.json();
       const url = data["authorization_url"];
       console.log(url);
-      WebBrowser.openAuthSessionAsync(url)
-      setLoading(false)
-
+      let responseURL = await WebBrowser.openAuthSessionAsync(url)
+      const parsedUrl = new URL(responseURL["url"]);
+      const state = decodeURIComponent(parsedUrl.searchParams.get('state'));
+      const code = decodeURIComponent(parsedUrl.searchParams.get('code'));
+      getToken(state, code);
+      navigation.navigate('auth/ConnectInfiniteCampus');
     } catch (error) {
       console.error("Error fetching state value:", error);
     }

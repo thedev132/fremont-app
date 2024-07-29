@@ -21,7 +21,17 @@ export default class InfiniteCampus {
               method: 'GET',
               credentials: 'include'
             });
-        
+            let result = await response.text()
+            console.log("\"" + result + "\"")
+            if (result == "password-error") {
+              return "password"
+            }
+            if (result.includes("captcha")) {
+              return "captcha"
+            }
+            if (result.includes("success")) {
+              return "success"
+            }
             return Promise.resolve();
           } catch (err) {
             return Promise.reject(err);
@@ -30,7 +40,7 @@ export default class InfiniteCampus {
 
     public async getGrades() {
         try {
-            const response = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/portal/grades`, {
+            const response = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/portal/grades/`, {
               method: 'GET',
               credentials: 'include'
             });
@@ -65,6 +75,7 @@ export default class InfiniteCampus {
               method: 'GET',
             });
             let data = await response.json();
+            console.log(data)
             let calendarID = data[0]['calendarID']
 
             const responseDay = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/calendar/instructionalDay?calendarID=${calendarID}&date=${date}`, {

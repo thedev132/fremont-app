@@ -6,6 +6,5 @@ import { stripAfterAtSymbol } from "@/constants/utils";
 export default async function makeUser() {
     let email = await AsyncStorage.getItem('IFEmail');
     let password = await EncryptedStorage.getItem('IFPassword');
-    
     return new InfiniteCampus(stripAfterAtSymbol(email), password);
 }
