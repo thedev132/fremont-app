@@ -100,83 +100,98 @@ export default function AddClubScreen({ navigation }) {
 
 
 const compareByName = (a, b) => a.name.localeCompare(b.name);
-
 useEffect(() => {
-    const fetchData = async () => {
-        try {
-            setLoading(true);
+  const fetchData = async () => {
+      try {
+          setLoading(true);
 
-            // Fetch and set my clubs
-            let storedMyOrgs = await AsyncStorage.getItem('myOrgs');
-            console.log(storedMyOrgs)
-            if (storedMyOrgs != null) {
-                let json = JSON.parse(storedMyOrgs);
-                let myClubs = json.map((org: any) => new NestedOrganization(org.id, org.name, org.type));
-                // Sort myClubs alphabetically by name
-                myClubs = myClubs.sort(compareByName);
-                setMyClubs(myClubs);
-            } else {
-                console.log("fetching")
-                let me = await getUserMe();
-                let myOrgs = me.getOrgs();
-                await AsyncStorage.setItem('myOrgs', JSON.stringify(myOrgs));
-                // Sort myOrgs alphabetically by name
-                myOrgs = myOrgs.sort(compareByName);
-                setMyClubs(myOrgs);
-                console.log("finished")
-            }
+          // Fetch and set my clubs
+          let storedMyOrgs = await AsyncStorage.getItem('myOrgs');
+          console.log(storedMyOrgs);
+          if (storedMyOrgs != null) {
+              let json = JSON.parse(storedMyOrgs);
+              let myClubs = json
+                  .map((org: any) => new NestedOrganization(org.id, org.name, org.type))
+                  .filter((club: any) => club.getType() === 3); // Filter by type 3
 
-            // Fetch and set other organizations
-            let storedOtherOrgs = await AsyncStorage.getItem('orgs');
-            let orgs: Organization[] = [];
-            if (storedOtherOrgs != null) {
-                let json = JSON.parse(storedOtherOrgs);
-                orgs = json.map((org: any) => new Organization(org.id, org.name, org.type, org.day, org.location, org.time, org.description));
-                // Sort orgs alphabetically by name
-                orgs = orgs.sort(compareByName);
-            } else {
-                orgs = await getAllOrganizations(1);
-                // Sort orgs alphabetically by name
-                orgs = orgs.sort(compareByName);
-                await AsyncStorage.setItem('orgs', JSON.stringify(orgs));
+              // Sort myClubs alphabetically by name
+              myClubs = myClubs.sort(compareByName);
+              setMyClubs(myClubs);
+          } else {
+              console.log("fetching");
+              let me = await getUserMe();
+              let myOrgs = me.getOrgs()
+                  .filter((club: any) => club.getType() === 3); // Filter by type 3
 
-            }
-            setAllOrgs(orgs);
+              await AsyncStorage.setItem('myOrgs', JSON.stringify(myOrgs));
+              // Sort myOrgs alphabetically by name
+              myOrgs = myOrgs.sort(compareByName);
+              setMyClubs(myOrgs);
+              console.log("finished");
+          }
 
-            setLoading(false);
-        } catch (error) {
-            console.error('Error fetching organizations:', error);
-            setLoading(false);
-        }
-    };
+          // Fetch and set other organizations
+          let storedOtherOrgs = await AsyncStorage.getItem('orgs');
+          let orgs: Organization[] = [];
+          if (storedOtherOrgs != null) {
+              let json = JSON.parse(storedOtherOrgs);
+              orgs = json
+                  .map((org: any) => new Organization(org.id, org.name, org.type, org.day, org.location, org.time, org.description))
+                  .filter((org: any) => org.getType() === 3); // Filter by type 3
 
-    const updateData = async () => {
-        try {
-            let me = await getUserMe();
-            let myOrgs = me.getOrgs();
-            await AsyncStorage.setItem('myOrgs', JSON.stringify(myOrgs));
-            // Sort myOrgs alphabetically by name
-            myOrgs = myOrgs.sort(compareByName);
-            setMyClubs(myOrgs);
+              // Sort orgs alphabetically by name
+              orgs = orgs.sort(compareByName);
+          } else {
+              orgs = await getAllOrganizations(1);
+              orgs = orgs
+                  .filter((org: any) => org.getType() === 3) // Filter by type 3
+                  .sort(compareByName); // Sort orgs alphabetically by name
 
-            let orgs = await getAllOrganizations(1);
-            await AsyncStorage.setItem('orgs', JSON.stringify(orgs));
-            // Sort orgs alphabetically by name
-            orgs = orgs.sort(compareByName);
-            setAllOrgs(orgs);
-        } catch (error) {
-            console.error('Error updating organizations:', error);
-        }
-    };
+              await AsyncStorage.setItem('orgs', JSON.stringify(orgs));
+          }
+          setAllOrgs(orgs);
 
-    fetchData()
-    updateData();
+          setLoading(false);
+      } catch (error) {
+          console.error('Error fetching organizations:', error);
+          setLoading(false);
+      }
+  };
+
+  const updateData = async () => {
+      try {
+          let me = await getUserMe();
+          let myOrgs = me.getOrgs()
+              .filter((club: any) => club.getType() === 3); // Filter by type 3
+
+          await AsyncStorage.setItem('myOrgs', JSON.stringify(myOrgs));
+          // Sort myOrgs alphabetically by name
+          myOrgs = myOrgs.sort(compareByName);
+          setMyClubs(myOrgs);
+
+          let orgs = await getAllOrganizations(1);
+          orgs = orgs
+              .filter((org: any) => org.getType() === 3) // Filter by type 3
+              .sort(compareByName); // Sort orgs alphabetically by name
+
+          await AsyncStorage.setItem('orgs', JSON.stringify(orgs));
+          setAllOrgs(orgs);
+      } catch (error) {
+          console.error('Error updating organizations:', error);
+      }
+  };
+
+  fetchData();
+  updateData();
 }, []);
+
 
     useEffect(() => {
         const filterClubs = () => {
-            const myClubIds = new Set(myClubs.map(club => Number(club.getId())));
-            const filteredClubs = allOrgs.filter(club => !myClubIds.has(Number(club.getId())));
+            const myClubIds = new Set(myClubs.map(club => Number(club.getId())));                                     
+            const filteredClubs = allOrgs
+            .filter(club => !myClubIds.has(Number(club.getId())))
+            .filter(club => club.getType() == "3"); // Filter by type 3
             setClubs(filteredClubs);
         };
         filterClubs();

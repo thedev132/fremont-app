@@ -13,6 +13,7 @@ export default function ScheduleScreen({navigation}) {
   const [loading, setLoading] = useState(true);
   const [isAfterSchool, setIsAfterSchool] = useState(false);
   const { width, height } = Dimensions.get('window');
+  const [coursesReleased, setCoursesReleased] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,7 +48,14 @@ export default function ScheduleScreen({navigation}) {
 
   const getCourses = async (user) => {
     try {
-      let courses = await user.getSchedule('2024-04-12');
+      const date = new Date();
+      const formattedDate = date.toISOString().split('T')[0];
+      let courses = await user.getSchedule(formattedDate);
+      console.log(courses);
+      if (courses == "No courses") {
+        setCoursesReleased(false);
+        return [];
+      }
       let uniqueCourses = [];
       let courseMap = {};
 
@@ -85,6 +93,21 @@ export default function ScheduleScreen({navigation}) {
 
   const iconSize = width > 350 ? 30 : 24; // Adjust size based on screen width
 
+  if (!coursesReleased) {
+    return (
+      <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
+        <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08 }}>
+          <TouchableOpacity onPress={() => navigation.navigate('misc/profile')}>
+            <Icon name="person" size={iconSize} color="#8B0000" />  
+          </TouchableOpacity>
+        </View>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ fontSize: 20, textAlign: 'center' }}>Courses have not been released yet!</Text>
+            <Text style={{ fontSize: 20, textAlign: 'center' }}>Check back after Firebird Fiesta</Text>
+          </View>
+      </SafeAreaView>
+    ) 
+  }
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>

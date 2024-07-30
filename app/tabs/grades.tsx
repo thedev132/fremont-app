@@ -18,11 +18,16 @@ export default function GradesScreen() {
   const [grades, setGrades] = useState<Grades>({});
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [dropdownItems, setDropdownItems] = useState<Array<{ label: string; value: string }>>([]);
+  const [gradesReleased, setGradesReleased] = useState(true);
 
   useEffect(() => {
     const fetchGrades = async () => {
       let user = await makeUser();
-      let grades: Grades = await user.getGrades();
+      let grades = await user.getGrades();
+      if (grades == 'No grades') {
+        setGradesReleased(false);
+        return;
+      }
 
       // Update the task names with "Semester Grade 1", "Semester Grade 2", etc.
       Object.keys(grades).forEach(subject => {
@@ -134,6 +139,15 @@ export default function GradesScreen() {
     if (value >= 60) return 'D-';
     return 'F';
   };
+
+  if (!gradesReleased) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text style={{ fontSize: 20, textAlign: 'center' }}>Your grades haven't been posted yet!</Text>
+        <Text style={{ fontSize: 20, textAlign: 'center' }}>Check back after Firebird Fiesta</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView>

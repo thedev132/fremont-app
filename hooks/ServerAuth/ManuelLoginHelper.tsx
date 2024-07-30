@@ -10,7 +10,7 @@ export const register = async (email: string, password: string) => {
             "body": `{\n    \"type\": 3,\n    \"email\": \"${email}\",\n    \"password\": \"${password}\",\n    \"re_password\": \"${password}\"\n}`,            "method": "POST",
           });
 
-          if (response.ok) {
+        if (response.ok) {
             return true;
         }
         return false;

@@ -18,10 +18,15 @@ export default function Register({navigation}) {
         }
         // Register the user
         try {
-            register(email, password);
+            let registerResponse = register(email, password);
+            if (await registerResponse == false) {
+                // Show error message
+                alert("Error registering user");
+                return;
+            }
             setLoading(true);
             let response = await login(email, password);
-            if (response) {  
+            if (response == true) {  
               navigation.navigate('auth/ConnectInfiniteCampus');
             }
           } catch (error) {

@@ -53,10 +53,12 @@ export default function LoginScreen({ navigation }) {
     try {
       let response = await login(email, password);
       console.log(response)
-      setLoading(true);
-      if (response) {
+      if (response == true) {
         // trigger a loading screen
         navigation.navigate('auth/ConnectInfiniteCampus');
+      }
+      else {
+        alert("Invalid email or password");
       }
     } catch (error) {
       console.error("Error logging in:", error);

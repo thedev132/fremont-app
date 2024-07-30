@@ -45,6 +45,9 @@ export default class InfiniteCampus {
             });
 
             let data = await response.json();
+            if (data.length == 0) {
+                return "No grades";
+            } 
             let courses = data[0]['courses'];
             let gradesDict = {};
 
@@ -74,6 +77,9 @@ export default class InfiniteCampus {
               method: 'GET',
             });
             let data = await response.json();
+            if (data.length == 0) {
+                return "No courses";
+            }
             let calendarID = data[0]['calendarID']
 
             const responseDay = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/calendar/instructionalDay?calendarID=${calendarID}&date=${date}`, {
@@ -128,13 +134,16 @@ export default class InfiniteCampus {
             method: 'GET',
           });
           let data = await response.json();
-          let personID =  data[0]['personID'];
+          console.log(data);
+          let studentID = data[0]['studentNumber'] ?? '';
+          if (studentID == '') {
+            return "No ID";
+          }
+          let personID =  data[0]['personID'] ?? '';
           let profilePicture = await this.getProfilePicture(personID) ?? ''
-          let studentID = data[0]['studentNumber'];
           let firstName = data[0]['firstName'];
-
           let lastName = data[0]['lastName'];
-          let grade = data[0]['enrollments'][0]['grade'];
+          let grade = data[0]['enrollments'][0]['grade'] ?? '';
           let student = new Student(firstName, lastName, grade, studentID, profilePicture);
           return student;
 

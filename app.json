@@ -19,7 +19,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
+        "foregroundImage": "./assets/images/iconA.png",
         "backgroundColor": "#fff"
       },
       "package": "org.fuhsd.fhs.app",

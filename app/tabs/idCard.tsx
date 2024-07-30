@@ -11,6 +11,7 @@ import makeUser from '@/hooks/InfiniteCampus/MakeUser';
 export default function IDCardScreen() {
     
     const [studentInfo, setStudentInfo] = useState<Student>();
+    const [idReleased, setIdReleased] = useState(true);
     useEffect(() => {
 
         const fetchData = async () => {
@@ -24,6 +25,11 @@ export default function IDCardScreen() {
             user.login();
             try {
                 let student = await user.getStudentInfo();
+                if (student == "No ID") {
+                    setIdReleased(false);
+                    return;
+                }
+                console.log(student);
                 if (storedStudentInfo === null) {
                     setStudentInfo(student);
                 }
@@ -36,6 +42,14 @@ export default function IDCardScreen() {
 
     }, []);
 
+    if (!idReleased) {
+        return (
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <Text style={{ fontSize: 20, textAlign: 'center' }}>Your ID Card hasn't been posted yet!</Text>
+                <Text style={{ fontSize: 20, textAlign: 'center' }}>Check back after Firebird Fiesta</Text>
+            </View>
+        )
+    }
     return (
         <View style={{flex:1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff'}}>
             <View style={{alignItems: 'center', marginBottom: 30}}>
