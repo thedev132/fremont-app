@@ -172,7 +172,7 @@ export default function RootLayout() {
                 <Stack.Screen options={({ route }) => ({ title: route.params.name, headerShown: true, headerTitleAlign: 'center', headerTintColor:'#fff', headerStyle: {backgroundColor:  '#8B0000' }})} name="misc/PostDetailView" component={PostDetailView} />
                 <Stack.Screen name="misc/profile" children={({ navigation }) => <ProfileScreen navigation={navigation} setLoggedIn={setLoggedIn} />} options={{headerShown: true, headerTitle: '', headerTransparent: true}}/>
                 <Stack.Screen name="misc/AddClub" component={AddClubScreen} options={{headerShown: true, headerTitle: '', headerTransparent: true}}/>
-                <Stack.Screen name="misc/ClubDetails" component={ClubDetails} options={{headerShown: true, headerTitle: '', headerTransparent: true}}/>
+                <Stack.Screen name="misc/ClubDetails" component={ClubDetails} options={({ route }) => ({ title: route.params.name, headerShown: true, headerTitleAlign: 'center', headerTintColor:'#fff', headerStyle: {backgroundColor:  '#8B0000' }})} component={ClubDetails}/>
               </Stack.Group> 
           </Stack.Group>
         ) : (
