@@ -3,7 +3,7 @@
     "name": "Fremont",
     "slug": "fremont-app",
     "owner": "mmortada685",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "fhs",
@@ -15,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "org.fuhsd.fhs.app"
+      "bundleIdentifier": "com.hackclub.fremontapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/iconA.png",
         "backgroundColor": "#fff"
       },
-      "package": "org.fuhsd.fhs.app",
+      "package": "com.hackclub.fremontapp",
       "googleServicesFile": "./google-services.json"
     },
     "plugins": [

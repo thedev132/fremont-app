@@ -83,13 +83,13 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'org.fuhsd.fhs.app'
+    namespace 'com.hackclub.fremontapp'
     defaultConfig {
-        applicationId 'org.fuhsd.fhs.app'
+        applicationId 'com.hackclub.fremontapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0.1"
     }
     signingConfigs {
         debug {

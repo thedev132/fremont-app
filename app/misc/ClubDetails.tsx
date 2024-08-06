@@ -40,7 +40,8 @@ export default function ClubDetails({ route, navigation }) {
         const fetchData = async () => {
             try {
                 let accessToken = await AsyncStorage.getItem('accessToken');
-                let response = await fetch(`https://fremont-app-backend.vercel.app/api/orgs/${id}`, {
+                console.log(accessToken)
+                let response = await fetch(`https://fremont-app-backend.vercel.app/api/orgs/${id}/`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -48,7 +49,8 @@ export default function ClubDetails({ route, navigation }) {
                     },
                 });
                 let data = await response.json();
-                setName(data.name);
+                console.log(data)
+                setName(name);
                 setDescription(data.description);
                 setDay(data.day);
                 setTime(data.time);

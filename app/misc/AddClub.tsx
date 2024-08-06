@@ -256,7 +256,6 @@ useEffect(() => {
 
     const myRenderItem = ({ item }: { item: NestedOrganization }) => {
         const screenWidth = Dimensions.get('window').width;
-
         return (
             <Card style={{
                 marginVertical: 5,

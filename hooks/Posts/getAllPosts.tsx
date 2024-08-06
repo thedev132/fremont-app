@@ -12,6 +12,7 @@ export default async function getAllPosts() {
         },
     });
     const data = await response.json();
+    console.log(data)
     let posts: Post[] = [];
     for (let post of data['results']) {
         let organization = new NestedOrganization(post['organization']['id'], post['organization']['name'], post['organization']['type']);

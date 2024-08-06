@@ -96,11 +96,11 @@ export default function ScheduleScreen({navigation}) {
   if (!coursesReleased) {
     return (
       <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
-        <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08 }}>
-          <TouchableOpacity onPress={() => navigation.navigate('misc/profile')}>
-            <Icon name="person" size={iconSize} color="#8B0000" />  
-          </TouchableOpacity>
-        </View>
+          <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08, zIndex: 1 }}>
+            <TouchableOpacity onPress={() => navigation.navigate('misc/profile')}>
+              <Icon name="person" size={iconSize} color="#8B0000" />
+            </TouchableOpacity>
+          </View>
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ fontSize: 20, textAlign: 'center' }}>Courses have not been released yet!</Text>
             <Text style={{ fontSize: 20, textAlign: 'center' }}>Check back after Firebird Fiesta</Text>
@@ -111,7 +111,7 @@ export default function ScheduleScreen({navigation}) {
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
-      <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08 }}>
+      <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08, zIndex: 1 }}>
         <TouchableOpacity onPress={() => navigation.navigate('misc/profile')}>
           <Icon name="person" size={iconSize} color="#8B0000" />  
         </TouchableOpacity>

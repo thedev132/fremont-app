@@ -9,7 +9,6 @@ import tw from "twrnc";
 
 export default function PostDetailView({ route, navigation }) {
     const { name, content, date, orgName } = route.params;
-    
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#F9F9F9', paddingHorizontal: 16 }}>
             <View style={{ marginBottom: 8 }}>
