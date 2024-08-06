@@ -1,50 +1,58 @@
-# Welcome to your Expo app 👋
+# Admin Panel Instruction Manual
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Welcome to the Fremont App Admin Panel Instruction Manual!
 
-## Get started
+This document outlines some of the features of the app and how to use them. This document is meant to be viewed by club officers and advisors, ASB members, and staff, but if you're not one of those, that's fine too :)
 
-1. Install dependencies
+For a table of contents, feel free to press the list button on the top left.
 
-   ```bash
-   npm install
-   ```
+If you have any questions, please contact one (or both) of the following people:
 
-2. Start the app
+- Mohamad Mortada, Lead App Developer and Creator
+  - oliver.ni@gmail.com
+  - Instagram: [mcparadip](https://www.instagram.com/mcparadip/)
+  - Discord: Oliver#0001
 
-   ```bash
-    npx expo start
-   ```
+## Admin Panel Access
 
-In the output, you'll find options to open the app in a
+Various features of the app can be controlled from the _Admin Panel_. This is a website (outside of the app itself) for club officers and advisors, ASB members, and staff.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+This admin panel is available a t[ https://fremont-app-backend.vercel.app/admin/.](https://tinyurl.com/fremont-app) You can login with your FUHSD Google Account by clicking the _Sign in with Google_ button. Anyone can login; however, to perform any actions, you must first be added as an admin to at least one _Organization_ (these include ASB, each graduating class, and clubs).
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+If you've logged onto the app in the past, you've likely already been added as an admin to any clubs you're an officer of. If you haven't, please let one of us know (contact information is at the top of the document) so we can add you.
 
-## Get a fresh project
+## Organization Management
 
-When you're ready, run:
+You can manage general information about any of the Organizations you're a part of on the [_Organizations_](https://fremont-app-backend.vercel.app/admin/core/organization/) tab.
 
-```bash
-npm run reset-project
-```
+![](./organization.png)
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+There are a couple fields here you can edit:
 
-## Learn more
+**Advisors/Admins.** Only advisors can edit other advisors, while both advisors and admins can edit admins. To add someone, start typing their name and autocomplete should pop up. If you can't find a user, that means they haven't logged in to the app yet.
 
-To learn more about developing your project with Expo, look at the following resources:
+**Name.** The name of the organization as displayed everywhere on the app and in other pages like the points view. Please only make small edits to this field. The name should remain mostly the same.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+**Description.** This text block is shown in the clubs tab of the app. We highly recommend filling this out so people can get a basic understanding of your organization if they click on it in the app.
 
-## Join the community
+**Day.** _Applicable only to clubs_. The day which your club holds regular meetings. This information is displayed on the app's club page.
 
-Join our community of developers creating universal apps.
+**Time.** _Applicable only to clubs_. The time period which your club holds regular meetings. This information is displayed on the app's club page.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**Location.** _Applicable only to clubs_. The Location which your club holds regular meetings. This information is displayed on the app's club page.
+
+## Announcements
+
+To post an announcement, click the add button on the _Posts_ tab.
+
+Select your organization and fill in the announcement details in the inputs provided.
+
+There are a couple fields you can edit:
+
+**Organization.** The organization this announcement is associated with.
+
+**Title.** The title of the announcement. This will be displayed on the list of announcements in the _News_ tab of the app.
+
+**Content.** The content of the announcement. This will be displayed in a sub-screen of the announcement.
+
+**Published.** Check the box for your announcement to be published.
