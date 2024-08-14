@@ -11,7 +11,7 @@ export default function ScheduleScreen({navigation}) {
   const [uniqueCourses, setUniqueCourses] = useState([]);
   const [classTimes, setClassTimes] = useState({ classes: [] });
   const [loading, setLoading] = useState(true);
-  const [isAfterSchool, setIsAfterSchool] = useState(false);
+  const [noSchoolToday, setNoSchoolToday] = useState(false);
   const { width, height } = Dimensions.get('window');
   const [coursesReleased, setCoursesReleased] = useState(true);
 
@@ -51,9 +51,14 @@ export default function ScheduleScreen({navigation}) {
       const date = new Date();
       const formattedDate = date.toISOString().split('T')[0];
       let courses = await user.getSchedule(formattedDate);
-      console.log(courses);
+      console.log("message" + courses);
       if (courses == "No courses") {
         setCoursesReleased(false);
+        return [];
+      }
+      if (courses == "No school today") {
+        console.log("there is no school")
+        setNoSchoolToday(true)
         return [];
       }
       let uniqueCourses = [];
@@ -107,6 +112,20 @@ export default function ScheduleScreen({navigation}) {
           </View>
       </SafeAreaView>
     ) 
+  }
+  if (noSchoolToday) {
+    return (
+      <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
+        <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08, zIndex: 1 }}>
+          <TouchableOpacity onPress={() => navigation.navigate('misc/profile')}>
+            <Icon name="person" size={iconSize} color="#8B0000" />
+          </TouchableOpacity>
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ fontSize: 20, textAlign: 'center' }}>No School Today!</Text>
+        </View>
+      </SafeAreaView>
+    )
   }
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>

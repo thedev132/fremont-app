@@ -183,4 +183,14 @@ export default class InfiniteCampus {
         }
     }
 
+    public async getEntireSchedule() {
+      const response = await fetch("https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_crossSite=true", {
+        "headers": {
+            "Accept": "application/json"
+        },
+        "method": "GET",
+      })
+      
+    }
+
 }
