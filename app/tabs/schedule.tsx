@@ -22,7 +22,6 @@ export default function ScheduleScreen({navigation}) {
         await user.login();
         
         let courses = await getCourses(user);
-
         setUniqueCourses(courses);
 
         let newClassTimes = { classes: [] };
@@ -58,8 +57,9 @@ export default function ScheduleScreen({navigation}) {
       }
       if (courses == "No school today") {
         console.log("there is no school")
+        let allClasses = await user.getEntireSchedule()
         setNoSchoolToday(true)
-        return [];
+        return allClasses;
       }
       let uniqueCourses = [];
       let courseMap = {};
@@ -121,9 +121,43 @@ export default function ScheduleScreen({navigation}) {
             <Icon name="person" size={iconSize} color="#8B0000" />
           </TouchableOpacity>
         </View>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={{ fontSize: 20, textAlign: 'center' }}>No School Today!</Text>
-        </View>
+        <View style={{ flex: 1, alignItems: 'center', width: '100%', marginTop: 75}}>
+          <Text style={{ fontSize: 25, textAlign: 'center', marginBottom: 20 }}>No School Today!</Text>
+        <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%', marginBottom: 100}}>
+          {uniqueCourses.map((course: Course, index) => (
+            <View
+              key={index}
+              style={{
+                backgroundColor: '#8B0000',
+                alignItems: 'flex-start',
+                padding: 20,
+                borderRadius: 15,
+                margin: 6,
+                marginHorizontal: 40,
+                // Shadow for iOS
+                // shadowColor: 'black',
+                // shadowOffset: { width: 10, height: 10 },
+                // shadowOpacity: 1,
+                // shadowRadius: 3,
+                // Shadow for Android
+                // elevation: 2
+              }}>
+              <Text style={{ color: '#fff' }}>{course.getName()}</Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                {course.getTeacherName() !== undefined && (
+                  <Text style={{ color: '#fff' }}>
+                    {course.getTeacherName() == undefined ? null : `${course.getTeacherName().replace(/,/g, '').trim().split(/\s+/)[1]} ${course.getTeacherName().replace(/,/g, '').trim().split(/\s+/)[0]}` }
+                  </Text>
+                )}
+
+                {course.getRoom() !== undefined && (
+                  <Text style={{ color: '#fff' }}> • RM: {course.getRoom()}</Text>
+                )}
+              </View>
+            </View>
+          ))}
+        </ScrollView>
+       </View>
       </SafeAreaView>
     )
   }

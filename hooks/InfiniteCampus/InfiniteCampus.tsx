@@ -190,7 +190,13 @@ export default class InfiniteCampus {
         },
         "method": "GET",
       })
-      
+      let data = await response.json()
+      let classes: Course[] = []
+      for (let course in data) {
+        classes.push(new Course(data[course]['courseName'], data[course]["teacherDisplay"], data[course]["roomName"], data[course]["sectionPlacements"][0]["periodName"], null, null,  data[course]["sectionPlacements"][0]['periodScheduleName']))
+      }
+      return classes
+
     }
 
 }
