@@ -144,7 +144,7 @@ export default function GradesScreen() {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <Text style={{ fontSize: 20, textAlign: 'center' }}>Your grades haven't been posted yet!</Text>
-        <Text style={{ fontSize: 20, textAlign: 'center' }}>Check back after Firebird Fiesta</Text>
+        <Text style={{ fontSize: 20, textAlign: 'center' }}>Check back after the first grading period</Text>
       </View>
     );
   }

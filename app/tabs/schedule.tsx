@@ -50,13 +50,11 @@ export default function ScheduleScreen({navigation}) {
       const date = new Date();
       const formattedDate = date.toISOString().split('T')[0];
       let courses = await user.getSchedule(formattedDate);
-      console.log("message" + courses);
       if (courses == "No courses") {
         setCoursesReleased(false);
         return [];
       }
       if (courses == "No school today") {
-        console.log("there is no school")
         let allClasses = await user.getEntireSchedule()
         setNoSchoolToday(true)
         return allClasses;
@@ -114,6 +112,14 @@ export default function ScheduleScreen({navigation}) {
     ) 
   }
   if (noSchoolToday) {
+    // sort classes by period number and if none put it last
+    uniqueCourses.sort((a: Course, b: Course) => {
+      let periodA = a.getPeriod();
+      let periodB = b.getPeriod();
+      if (periodA < periodB) return -1;
+      if (periodA > periodB) return 1;
+      return 0;
+    });
     return (
       <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
         <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08, zIndex: 1 }}>

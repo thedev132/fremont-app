@@ -16,61 +16,6 @@ export default function ProfileScreen({ navigation, setLoggedIn }) {
   const [me, setMe] = React.useState<User | null>(null);
   const [loading, setLoading] = React.useState(false);
 
-  const ClassSelect = () => {
-    const [selected, setSelected] = React.useState<number | undefined>(undefined);
-    const { width } = Dimensions.get("window");
-    const isSmallScreen = width < 350;
-
-    const handleSelectYear = async (year: number) => {
-      if (selected !== undefined) return;
-      setSelected(year);
-      let accessToken = await AsyncStorage.getItem("accessToken");
-      const response = await fetch("https://fremont-app-backend.vercel.app/api/users/me/", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ grad_year: year }),
-      });
-      let newMe = new User(me?.getFirstName(), me?.getLastName(), me?.getPictureUrl(), me?.getEmail(), year, me?.getOrgs());
-      await AsyncStorage.setItem("me", JSON.stringify(newMe));
-      setMe(newMe);
-      console.log(await response.json());
-    };
-
-    return (
-      <Alert
-        status="info"
-        title="Missing Graduation Year"
-        description="Please select your graduation year to gain access to all the features of this app."
-      >
-        <View
-          style={[
-            tw`flex-row justify-center`,
-            { width: isSmallScreen ? "100%" : "auto" },
-          ]}
-        >
-          {[2028, 2027, 2026, 2025].map((x) => (
-            <FilledButton
-              key={x}
-              style={[
-                tw`mx-1 my-1 px-2 py-1`,
-                isSmallScreen && { minWidth: 50, paddingVertical: 4, paddingHorizontal: 8 },
-              ]} // Adjust margin and padding for smaller buttons
-              textStyle={tw`text-sm text-center`} // Smaller text
-              disabled={selected === x}
-              loading={selected === x}
-              onPress={() => handleSelectYear(x)}
-            >
-              {x}
-            </FilledButton>
-          ))}
-        </View>
-      </Alert>
-    );
-  };
-
   React.useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -123,7 +68,6 @@ export default function ProfileScreen({ navigation, setLoggedIn }) {
             paddingHorizontal: 15,
           }}
         >
-          {!me?.getGradYear() ? <ClassSelect /> : null}
         </View>
         <View>
           <View

@@ -38,35 +38,46 @@ export default class InfiniteCampus {
     }
 
     public async getGrades() {
-        try {
-            const response = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/portal/grades/`, {
+      try {
+          const response = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/portal/grades/`, {
               method: 'GET',
               credentials: 'include'
-            });
-
-            let data = await response.json();
-            if (data.length == 0) {
-                return "No grades";
-            } 
-            let courses = data[0]['courses'];
-            let gradesDict = {};
-
-            for (let course of courses) {
-                let courseName = course['courseName'];
-                gradesDict[courseName] = [];
-                
-                for (let gradingTask of course['gradingTasks']) {
-                    gradesDict[courseName].push({
-                        taskName: gradingTask['taskName'],
-                        score: gradingTask['score']
-                    });
-                }
-            }
-            return gradesDict;
-          } catch (err) {
-            return Promise.reject(err);
+          });
+  
+          let data = await response.json();
+          if (data.length === 0) {
+              return "No grades";
           }
-    }
+  
+          let courses = data[0]['courses'];
+          let gradesDict = {};
+          let hasGrades = false;
+  
+          for (let course of courses) {
+              let courseName = course['courseName'];
+              gradesDict[courseName] = [];
+              
+              for (let gradingTask of course['gradingTasks']) {
+                  if (gradingTask['score']) {
+                      hasGrades = true;
+                  }
+                  gradesDict[courseName].push({
+                      taskName: gradingTask['taskName'],
+                      score: gradingTask['score']
+                  });
+              }
+          }
+  
+          if (!hasGrades) {
+              return "No grades";
+          }
+  
+          return gradesDict;
+      } catch (err) {
+          return Promise.reject(err);
+      }
+  }
+  
 
 
     public async getSchedule(date: Date | string) {
