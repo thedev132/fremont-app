@@ -57,7 +57,20 @@ export default function ScheduleScreen({navigation}) {
       if (courses == "No school today") {
         let allClasses = await user.getEntireSchedule()
         setNoSchoolToday(true)
-        return allClasses;
+        let filteredCourses = allClasses.filter((course: Course) => {
+          return course.getName() !== "FHS Tutorial" ;
+        })
+        filteredCourses = filteredCourses.filter((course: Course) => {
+          return course.getName() !== "Advisory" ;
+        })
+        filteredCourses.sort((a: Course, b: Course) => {
+          let periodA = a.getPeriod();
+          let periodB = b.getPeriod();
+          if (periodA < periodB) return -1;
+          if (periodA > periodB) return 1;
+          return
+        });
+        return filteredCourses;
       }
       let uniqueCourses = [];
       let courseMap = {};
@@ -113,13 +126,7 @@ export default function ScheduleScreen({navigation}) {
   }
   if (noSchoolToday) {
     // sort classes by period number and if none put it last
-    uniqueCourses.sort((a: Course, b: Course) => {
-      let periodA = a.getPeriod();
-      let periodB = b.getPeriod();
-      if (periodA < periodB) return -1;
-      if (periodA > periodB) return 1;
-      return 0;
-    });
+    // remove tutorial and advisory using setUniqueCourses
     return (
       <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
         <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08, zIndex: 1 }}>
@@ -152,11 +159,11 @@ export default function ScheduleScreen({navigation}) {
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 {course.getTeacherName() !== undefined && (
                   <Text style={{ color: '#fff' }}>
-                    {course.getTeacherName() == undefined ? null : `${course.getTeacherName().replace(/,/g, '').trim().split(/\s+/)[1]} ${course.getTeacherName().replace(/,/g, '').trim().split(/\s+/)[0]}` }
+                    {course.getTeacherName() == undefined ? null : `${course.getTeacherName()?.replace(/,/g, '').trim().split(/\s+/)[1]} ${course.getTeacherName()?.replace(/,/g, '').trim().split(/\s+/)[0]}` }
                   </Text>
                 )}
 
-                {course.getRoom() !== undefined && (
+                {course.getRoom() !== undefined && course.getRoom() !== ""  && (
                   <Text style={{ color: '#fff' }}> • RM: {course.getRoom()}</Text>
                 )}
               </View>
@@ -206,9 +213,9 @@ export default function ScheduleScreen({navigation}) {
                   </Text>
                 )}
                 <Text style={{ color: '#fff' }}>
-                  {course.getTeacherName().replace(/,/g, '').trim().split(/\s+/)[0]}
+                  {' '}{course.getTeacherName()?.replace(/,/g, '').trim().split(/\s+/)[0]}
                 </Text>
-                {course.getRoom() !== undefined && (
+                {course.getRoom() !== undefined && course.getRoom() !== "" && (
                   <Text style={{ color: '#fff' }}> • RM: {course.getRoom()}</Text>
                 )}
               </View>

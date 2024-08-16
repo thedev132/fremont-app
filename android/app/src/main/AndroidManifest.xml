@@ -29,9 +29,8 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="fhs"/>
-        <data android:scheme="org.fuhsd.fhs.app"/>
-        <data android:scheme="exp+fremont-app"/>
         <data android:scheme="com.hackclub.fremontapp"/>
+        <data android:scheme="exp+fremont-app"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>

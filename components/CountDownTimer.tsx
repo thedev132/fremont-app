@@ -77,7 +77,7 @@ const ClassCountdown = ({ time }) => {
   }, [time]);
 
   // responsive size and fontSize
-  const timerSize = width > 350 ? width * 0.6 : width * 0.8;
+  const timerSize = width > 350 ? width * 0.57 : width * 0.8;
   const baseFontSize = width > 350 ? width * 0.06 : width * 0.08;
   const largeFontSize = baseFontSize * 1.2; // Increase the font size for the countdown display
 
@@ -106,7 +106,7 @@ const ClassCountdown = ({ time }) => {
             ? "After School"
             : isClassOngoing
             ? `${Math.ceil(currentClassRemainingTime / 60 - 1)}:${currentClassRemainingTime % 60 < 10 ? '0' : ''}${currentClassRemainingTime % 60}`
-            : `Next class in ${'\n'}${Math.ceil(nextClassRemainingTime / 60)}:${nextClassRemainingTime % 60 < 10 ? '0' : ''}${nextClassRemainingTime % 60}`}
+            : `Next class in ${'\n'}${Math.ceil(nextClassRemainingTime / 60 - 1)}:${nextClassRemainingTime % 60 < 10 ? '0' : ''}${nextClassRemainingTime % 60}`}
         </Text>
       )}
     </CountdownCircleTimer>
