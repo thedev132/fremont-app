@@ -81,7 +81,6 @@ export default class InfiniteCampus {
   
 
 
-<<<<<<< HEAD
   public async getSchedule(date: Date | string) {
     try {
         let courses = new Array<Course>();
@@ -93,21 +92,6 @@ export default class InfiniteCampus {
             return "No courses";
         }
         let calendarID = data[0]['calendarID'];
-=======
-    public async getSchedule(date: Date | string) {
-        
-        try {
-            let courses = new Array<Course>();
-            const response = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_date=${date}`, {
-              method: 'GET',
-            });
-            let data = await response.json();
-            console.log(data);
-            if (data.length == 0) {
-                return "No courses";
-            }
-            let calendarID = data[0]['calendarID']
->>>>>>> e4f2305724c61812591c3c3178022e036c53b7ab
 
         const responseDay = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/calendar/instructionalDay?calendarID=${calendarID}&date=${date}`, {
             method: 'GET',
