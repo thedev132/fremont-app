@@ -3,7 +3,7 @@
     "name": "Fremont",
     "slug": "fremont-app",
     "owner": "mmortada685",
-    "version": "1.0.2",
+    "version": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "fhs",
@@ -15,7 +15,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hackclub.fremontapp"
+      "bundleIdentifier": "com.hackclub.fremontapp",
+      "entitlements": {
+        "aps-environment": "development"
+      }
     },
     "android": {
       "adaptiveIcon": {

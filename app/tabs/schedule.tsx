@@ -6,6 +6,11 @@ import ClassCountdown from '@/components/CountDownTimer';
 import formatTime from '@/constants/FormatTime';
 import makeUser from '@/hooks/InfiniteCampus/MakeUser';
 import Icon from '@expo/vector-icons/MaterialIcons'; // Or another icon set
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import getGraduationYear from '@/constants/getGradYear';
+import * as Notifications from 'expo-notifications';
+import UpdateExpoPushToken from '@/hooks/ServerAuth/UpdateExpoPushToken';
+import Constants from 'expo-constants';
 
 export default function ScheduleScreen({navigation}) {
   const [uniqueCourses, setUniqueCourses] = useState([]);
@@ -16,7 +21,43 @@ export default function ScheduleScreen({navigation}) {
   const [coursesReleased, setCoursesReleased] = useState(true);
 
   useEffect(() => {
+    
     const fetchData = async () => {
+      const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+      const pushTokenString = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId,
+        })
+      ).data;
+      let accessToken = await AsyncStorage.getItem('accessToken');
+      if (accessToken === null || accessToken === '') {
+        return;
+      }
+      else {
+        UpdateExpoPushToken(pushTokenString)
+      }
+      let gradYear = await AsyncStorage.getItem('gradYear');
+      if (gradYear === null) {
+        let user = await makeUser();
+        user.login();
+        let student = await user.getStudentInfo();
+        if (student == "No ID") {
+          return;
+        }
+        else {
+          await AsyncStorage.setItem('gradYear', student.getGrade());
+          let accessToken = await AsyncStorage.getItem("accessToken");
+          let year = getGraduationYear(Number(student.getGrade()));
+          const response = await fetch("https://fremont-app-backend.vercel.app/api/users/me/", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ grad_year: year }),
+          });
+        }
+      }
       try {
         let user = await makeUser();
         await user.login();

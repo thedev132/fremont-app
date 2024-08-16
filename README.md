@@ -44,3 +44,31 @@ Provide the details for the announcement, including:
 - **Title:** The title that will appear in the _News_ tab of the app.
 - **Content:** The main content of the announcement, displayed in the detailed view.
 - **Published:** Check this box to publish the announcement.
+
+
+## Self Hosting
+
+### Step  1: Clone the code
+git clone https://thedev132/fremont-app
+
+### Step 2: Install required dependencies
+npm install 
+
+### Step 3: Install proper software 
+
+For iOS development:
+Install Xcode on MacOS
+
+For Android Development:
+Install Android Studio
+
+### Step 4: Prebuild
+
+Run npx expo prebuild
+
+### Step 5: Run!
+
+For iOS: npx expo run:ios
+For Android: npx expo run:android
+
+#### Step 6: Enjoy!

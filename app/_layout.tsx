@@ -94,9 +94,12 @@ export default function RootLayout() {
   }
   
   useEffect(() => {
-    registerForPushNotificationsAsync()
-      .then(token => setExpoPushToken(token ?? ''))
-      .catch((error: any) => setExpoPushToken(`${error}`));
+    const registerForPushNotificationsAsyncFunction = async () => {
+      await registerForPushNotificationsAsync()
+        .then(token => setExpoPushToken(token ?? ''))
+        .catch((error: any) => setExpoPushToken(`${error}`));
+    }
+    registerForPushNotificationsAsyncFunction();
     const storeToken = async (token: string) => {
       await AsyncStorage.setItem('expoPushToken', token);
     };
@@ -128,28 +131,6 @@ export default function RootLayout() {
         }
 
         else if (value === 'true') {
-          let gradYear = await AsyncStorage.getItem('gradYear');
-          if (gradYear === null) {
-            let user = await makeUser();
-            user.login();
-            let student = await user.getStudentInfo();
-            if (student == "No ID") {
-              return;
-            }
-            else {
-              await AsyncStorage.setItem('gradYear', student.getGrade());
-              let accessToken = await AsyncStorage.getItem("accessToken");
-              let year = getGraduationYear(Number(student.getGrade()));
-              const response = await fetch("https://fremont-app-backend.vercel.app/api/users/me/", {
-                method: "PUT",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify({ grad_year: year }),
-              });
-            }
-          }
           setLoggedIn(true);
         }
         
