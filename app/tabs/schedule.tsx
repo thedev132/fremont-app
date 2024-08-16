@@ -90,7 +90,7 @@ export default function ScheduleScreen({navigation}) {
     try {
       const date = new Date();
       const formattedDate = date.toISOString().split('T')[0];
-      let courses = await user.getSchedule("2024-08-21");
+      let courses = await user.getSchedule(formattedDate);
       if (courses == "No courses") {
         setCoursesReleased(false);
         return [];
