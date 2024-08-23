@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Course from '@/hooks/InfiniteCampus/InfiniteCampusCourse';
@@ -11,108 +11,95 @@ import getGraduationYear from '@/constants/getGradYear';
 import * as Notifications from 'expo-notifications';
 import UpdateExpoPushToken from '@/hooks/ServerAuth/UpdateExpoPushToken';
 import Constants from 'expo-constants';
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 
-export default function ScheduleScreen({navigation}) {
+export default function ScheduleScreen({ navigation }) {
   const [uniqueCourses, setUniqueCourses] = useState([]);
   const [classTimes, setClassTimes] = useState({ classes: [] });
   const [loading, setLoading] = useState(true);
   const [noSchoolToday, setNoSchoolToday] = useState(false);
-  const { width, height } = Dimensions.get('window');
+  const {width, height } = Dimensions.get('window');
   const [coursesReleased, setCoursesReleased] = useState(true);
+  const [rerenderClock, setRerenderClock] = useState(0);
 
-  useEffect(() => {
-    
-    const fetchData = async () => {
-      const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
-      const pushTokenString = (
-        await Notifications.getExpoPushTokenAsync({
-          projectId,
-        })
-      ).data;
-      let accessToken = await AsyncStorage.getItem('accessToken');
-      if (accessToken === null || accessToken === '') {
-        return;
+  const fetchData = async () => {
+    const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+    const pushTokenString = (
+      await Notifications.getExpoPushTokenAsync({
+        projectId,
+      })
+    ).data;
+    let accessToken = await AsyncStorage.getItem('accessToken');
+    if (accessToken !== null && accessToken !== '') {
+      UpdateExpoPushToken(pushTokenString);
+    }
+
+    let gradYear = await AsyncStorage.getItem('gradYear');
+    if (gradYear === null) {
+      let user = await makeUser();
+      user.login();
+      let student = await user.getStudentInfo();
+      if (student !== "No ID") {
+        await AsyncStorage.setItem('gradYear', student.getGrade());
+        let year = getGraduationYear(Number(student.getGrade()));
+        await fetch("https://fremont-app-backend.vercel.app/api/users/me/", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ grad_year: year }),
+        });
       }
-      else {
-        UpdateExpoPushToken(pushTokenString)
-      }
-      let gradYear = await AsyncStorage.getItem('gradYear');
-      if (gradYear === null) {
-        let user = await makeUser();
-        user.login();
-        let student = await user.getStudentInfo();
-        if (student == "No ID") {
-          return;
+    }
+
+    try {
+      let user = await makeUser();
+      await user.login();
+      let courses = await getCourses(user);
+      setUniqueCourses(courses);
+
+      let newClassTimes = { classes: [] };
+      for (let course of courses) {
+        let startTime = course.getStartTime();
+        let endTime = course.getEndTime();
+        if (startTime && endTime) {
+          newClassTimes.classes.push({ start: startTime, end: endTime });
         }
-        else {
-          await AsyncStorage.setItem('gradYear', student.getGrade());
-          let accessToken = await AsyncStorage.getItem("accessToken");
-          let year = getGraduationYear(Number(student.getGrade()));
-          const response = await fetch("https://fremont-app-backend.vercel.app/api/users/me/", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({ grad_year: year }),
-          });
-        }
       }
-      try {
-        let user = await makeUser();
-        await user.login();
-        
-        let courses = await getCourses(user);
-        setUniqueCourses(courses);
+      setClassTimes(newClassTimes);
+      setLoading(false);
 
-        let newClassTimes = { classes: [] };
-        for (let course of courses) {
-          let startTime = course.getStartTime();
-          let endTime = course.getEndTime();
-          if (startTime && endTime) {
-            newClassTimes.classes.push({ start: startTime, end: endTime });
-          }
-        }
-        setClassTimes(newClassTimes);
-
-        setLoading(false);
-
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setLoading(false);
+    }
+  };
 
   const getCourses = async (user) => {
     try {
       const date = new Date();
-      const formattedDate = date.toISOString().split('T')[0];
+      const formattedDate = date.toLocaleDateString('en-CA'); // 'en-CA' format is 'YYYY-MM-DD'
+      console.log(formattedDate);      
       let courses = await user.getSchedule(formattedDate);
-      if (courses == "No courses") {
+      if (courses === "No courses") {
         setCoursesReleased(false);
         return [];
       }
-      if (courses == "No school today") {
-        let allClasses = await user.getEntireSchedule()
-        setNoSchoolToday(true)
+      if (courses === "No school today") {
+        let allClasses = await user.getEntireSchedule();
+        setNoSchoolToday(true);
         let filteredCourses = allClasses.filter((course: Course) => {
-          return course.getName() !== "FHS Tutorial" ;
-        })
-        filteredCourses = filteredCourses.filter((course: Course) => {
-          return course.getName() !== "Advisory" ;
-        })
+          return course.getName() !== "FHS Tutorial" && course.getName() !== "Advisory";
+        });
         filteredCourses.sort((a: Course, b: Course) => {
           let periodA = a.getPeriod();
           let periodB = b.getPeriod();
-          if (periodA < periodB) return -1;
-          if (periodA > periodB) return 1;
-          return
+          return periodA - periodB;
         });
         return filteredCourses;
       }
+
       let uniqueCourses = [];
       let courseMap = {};
 
@@ -140,34 +127,33 @@ export default function ScheduleScreen({navigation}) {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      setRerenderClock(rerenderClock + 1);
+      fetchData();
+    }, [])
+  );
+
+  useEffect(() => { 
+    const interval = setInterval(() => {
+      setRerenderClock(rerenderClock + 1);
+      fetchData();
+    }, 60000);
+    return () => clearInterval(interval);
+  }
+  , []);
+
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size='large' color='#BF1B1B' />
       </View>
-    )
+    );
   }
 
-  const iconSize = width > 350 ? 30 : 24; // Adjust size based on screen width
+  const iconSize = width > 350 ? 30 : 24;
 
   if (!coursesReleased) {
-    return (
-      <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
-          <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08, zIndex: 1 }}>
-            <TouchableOpacity onPress={() => navigation.navigate('misc/profile')}>
-              <Icon name="person" size={iconSize} color="#8B0000" />
-            </TouchableOpacity>
-          </View>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ fontSize: 20, textAlign: 'center' }}>Courses have not been released yet!</Text>
-            <Text style={{ fontSize: 20, textAlign: 'center' }}>Check back after Firebird Fiesta</Text>
-          </View>
-      </SafeAreaView>
-    ) 
-  }
-  if (noSchoolToday) {
-    // sort classes by period number and if none put it last
-    // remove tutorial and advisory using setUniqueCourses
     return (
       <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
         <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08, zIndex: 1 }}>
@@ -175,57 +161,65 @@ export default function ScheduleScreen({navigation}) {
             <Icon name="person" size={iconSize} color="#8B0000" />
           </TouchableOpacity>
         </View>
-        <View style={{ flex: 1, alignItems: 'center', width: '100%', marginTop: 75}}>
-          <Text style={{ fontSize: 25, textAlign: 'center', marginBottom: 20 }}>No School Today!</Text>
-        <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%', marginBottom: 100}}>
-          {uniqueCourses.map((course: Course, index) => (
-            <View
-              key={index}
-              style={{
-                backgroundColor: '#8B0000',
-                alignItems: 'flex-start',
-                padding: 20,
-                borderRadius: 15,
-                margin: 6,
-                marginHorizontal: 40,
-                // Shadow for iOS
-                // shadowColor: 'black',
-                // shadowOffset: { width: 10, height: 10 },
-                // shadowOpacity: 1,
-                // shadowRadius: 3,
-                // Shadow for Android
-                // elevation: 2
-              }}>
-              <Text style={{ color: '#fff' }}>{course.getName()}</Text>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                {course.getTeacherName() !== undefined && (
-                  <Text style={{ color: '#fff' }}>
-                    {course.getTeacherName() == undefined ? null : `${course.getTeacherName()?.replace(/,/g, '').trim().split(/\s+/)[1]} ${course.getTeacherName()?.replace(/,/g, '').trim().split(/\s+/)[0]}` }
-                  </Text>
-                )}
-
-                {course.getRoom() !== undefined && course.getRoom() !== ""  && (
-                  <Text style={{ color: '#fff' }}> • RM: {course.getRoom()}</Text>
-                )}
-              </View>
-            </View>
-          ))}
-        </ScrollView>
-       </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ fontSize: 20, textAlign: 'center' }}>Courses have not been released yet!</Text>
+          <Text style={{ fontSize: 20, textAlign: 'center' }}>Check back after Firebird Fiesta</Text>
+        </View>
       </SafeAreaView>
-    )
+    );
   }
+
+  if (noSchoolToday) {
+    return (
+      <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
+        <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08, zIndex: 1 }}>
+          <TouchableOpacity onPress={() => navigation.navigate('misc/profile')}>
+            <Icon name="person" size={iconSize} color="#8B0000" />
+          </TouchableOpacity>
+        </View>
+        <View style={{ flex: 1, alignItems: 'center', width: '100%', marginTop: 75 }}>
+          <Text style={{ fontSize: 25, textAlign: 'center', marginBottom: 20 }}>No School Today!</Text>
+          <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%', marginBottom: 100 }}>
+            {uniqueCourses.map((course: Course, index) => (
+              <View
+                key={index}
+                style={{
+                  backgroundColor: '#8B0000',
+                  alignItems: 'flex-start',
+                  padding: 20,
+                  borderRadius: 15,
+                  margin: 6,
+                  marginHorizontal: 40,
+                }}>
+                <Text style={{ color: '#fff' }}>{course.getName()}</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  {course.getTeacherName() !== undefined && (
+                    <Text style={{ color: '#fff' }}>
+                      {course.getTeacherName()?.replace(/,/g, '').trim().split(/\s+/).reverse().join(' ')}
+                    </Text>
+                  )}
+                  {course.getRoom() !== undefined && course.getRoom() !== "" && (
+                    <Text style={{ color: '#fff' }}> • RM: {course.getRoom()}</Text>
+                  )}
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <SafeAreaView style={{ flex: 1, alignItems: 'center' }}>
-      <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08, zIndex: 1 }}>
-        <TouchableOpacity onPress={() => navigation.navigate('misc/profile')}>
-          <Icon name="person" size={iconSize} color="#8B0000" />  
-        </TouchableOpacity>
-      </View>
-        
+        <View style={{ position: 'absolute', top: height * 0.06, right: width * 0.08, zIndex: 1 }}>
+          <TouchableOpacity onPress={() => navigation.navigate('misc/profile')}>
+            <Icon name="person" size={iconSize} color="#8B0000" />
+          </TouchableOpacity>
+        </View>
         <View style={{ marginTop: 30, marginBottom: 10 }}>
-          <ClassCountdown time={classTimes} />
+          <ClassCountdown key={rerenderClock} time={classTimes} />
         </View>
         <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%', marginBottom: 100 }}>
           {uniqueCourses.map((course, index) => (

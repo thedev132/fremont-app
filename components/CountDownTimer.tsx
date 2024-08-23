@@ -37,9 +37,11 @@ const calculateTimes = (classTimes) => {
     prevClassEndInSeconds = classEndInSeconds;
     return { classStartInSeconds, classEndInSeconds };
   });
-
   const lastClassEnd = Math.max(...classData.map(cd => cd.classEndInSeconds));
-  const afterSchool = !isClassOngoing && currentTimeInSeconds > lastClassEnd;
+  let afterSchool = !isClassOngoing && currentTimeInSeconds > lastClassEnd;
+  if (Number.isNaN(lastClassEnd) || lastClassEnd === -Infinity) {
+    afterSchool = true;
+  }
 
   return {
     currentClassRemainingTime,
@@ -93,6 +95,7 @@ const ClassCountdown = ({ time }) => {
       strokeWidth={timerSize * 0.064} // 16/250 ratio for different sizes
       trailStrokeWidth={timerSize * 0.06} // 15/250 ratio for different sizes
       trailColor="rgba(233, 233, 233, 1)"
+      
     >
       {() => (
         <Text style={{ 

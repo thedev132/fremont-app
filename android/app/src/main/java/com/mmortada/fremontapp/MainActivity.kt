@@ -1,4 +1,4 @@
-package com.hackclub.fremontapp
+package com.mmortada.fremontapp
 
 import android.os.Build
 import android.os.Bundle

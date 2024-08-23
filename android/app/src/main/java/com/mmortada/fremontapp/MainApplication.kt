@@ -1,4 +1,4 @@
-package com.hackclub.fremontapp
+package com.mmortada.fremontapp
 
 import android.app.Application
 import android.content.res.Configuration

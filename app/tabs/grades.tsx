@@ -19,12 +19,15 @@ export default function GradesScreen() {
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [dropdownItems, setDropdownItems] = useState<Array<{ label: string; value: string }>>([]);
   const [gradesReleased, setGradesReleased] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     const fetchGrades = async () => {
       let user = await makeUser();
       let grades = await user.getGrades();
       if (grades == 'No grades') {
+        setLoading(false);
         setGradesReleased(false);
         return;
       }
@@ -53,6 +56,7 @@ export default function GradesScreen() {
       setSelectedSubject(subjects[0]?.value || ''); // Set the default selected subject if available
     };
     fetchGrades();
+    setLoading(false);
   }, []);
 
   const screenWidth = Dimensions.get('window').width;
@@ -148,7 +152,13 @@ export default function GradesScreen() {
       </View>
     );
   }
-
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size='large' color='#BF1B1B' />
+      </View>
+    );
+  }
   return (
     <ScrollView>
       <View style={{ flex: 1, padding: 16 }}>

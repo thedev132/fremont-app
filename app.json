@@ -3,7 +3,7 @@
     "name": "Fremont",
     "slug": "fremont-app",
     "owner": "mmortada685",
-    "version": "1.0.8",
+    "version": "0.51",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "fhs",
@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hackclub.fremontapp",
+      "bundleIdentifier": "com.mmortada.fremontapp",
       "entitlements": {
         "aps-environment": "development"
       }
@@ -25,7 +25,7 @@
         "foregroundImage": "./assets/images/iconA.png",
         "backgroundColor": "#fff"
       },
-      "package": "com.hackclub.fremontapp",
+      "package": "com.mmortada.fremontapp",
       "googleServicesFile": "./google-services.json"
     },
     "plugins": [

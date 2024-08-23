@@ -109,13 +109,13 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.hackclub.fremontapp'
+    namespace 'com.mmortada.fremontapp'
     defaultConfig {
-        applicationId 'com.hackclub.fremontapp'
+        applicationId 'com.mmortada.fremontapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0.8"
+        versionName "0.51"
     }
     signingConfigs {
         debug {
