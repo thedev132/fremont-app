@@ -219,7 +219,7 @@ export default function ScheduleScreen({ navigation }) {
           </TouchableOpacity>
         </View>
         <View style={{ marginTop: 30, marginBottom: 10 }}>
-          <ClassCountdown key={rerenderClock} time={classTimes} />
+          <ClassCountdown keyNumber={rerenderClock} time={classTimes} />
         </View>
         <ScrollView showsVerticalScrollIndicator={false} style={{ width: '100%', marginBottom: 100 }}>
           {uniqueCourses.map((course, index) => (

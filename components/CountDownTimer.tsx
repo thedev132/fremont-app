@@ -55,7 +55,7 @@ const calculateTimes = (classTimes) => {
 
 const { width, height } = Dimensions.get('window');
 
-const ClassCountdown = ({ time }) => {
+const ClassCountdown = ({ time, keyNumber }) => {
   const initialCalculation = calculateTimes(time);
   const [currentClassRemainingTime, setCurrentClassRemainingTime] = useState(initialCalculation.currentClassRemainingTime);
   const [nextClassRemainingTime, setNextClassRemainingTime] = useState(initialCalculation.nextClassRemainingTime);
@@ -86,6 +86,7 @@ const ClassCountdown = ({ time }) => {
 
   return (
     <CountdownCircleTimer
+      key={keyNumber}
       isPlaying={true}
       duration={isClassOngoing ? totalClassDuration : breakDuration}
       initialRemainingTime={isClassOngoing ? currentClassRemainingTime : nextClassRemainingTime}
