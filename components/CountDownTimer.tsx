@@ -121,21 +121,11 @@ const ClassCountdown = ({ time, keyNumber }) => {
           textAlign: 'center', 
           fontFamily: 'Inter-Bold' 
         }}>
-          {
-            afterSchool
-              ? "After School"
-              : isClassOngoing
-              ? `${Math.floor(currentClassRemainingTime / 3600) > 0 
-                  ? `${Math.floor(currentClassRemainingTime / 3600)}:` 
-                  : ''}${Math.floor((currentClassRemainingTime % 3600) / 60)}:${currentClassRemainingTime % 60 < 10 
-                  ? '0' 
-                  : ''}${currentClassRemainingTime % 60}`
-              : `Next class in ${'\n'}${Math.floor(nextClassRemainingTime / 3600) > 0 
-                  ? `${Math.floor(nextClassRemainingTime / 3600)}:` 
-                  : ''}${Math.floor((nextClassRemainingTime % 3600) / 60)}:${nextClassRemainingTime % 60 < 10 
-                  ? '0' 
-                  : ''}${nextClassRemainingTime % 60}`
-          }
+          {afterSchool
+            ? "After School"
+            : isClassOngoing
+            ? `${Math.ceil(currentClassRemainingTime / 60 - 1)}:${currentClassRemainingTime % 60 < 10 ? '0' : ''}${currentClassRemainingTime % 60}`
+            : `Next class in ${'\n'}${Math.ceil(nextClassRemainingTime / 60 - 1)}:${nextClassRemainingTime % 60 < 10 ? '0' : ''}${nextClassRemainingTime % 60}`}
         </Text>
       )}
     </CountdownCircleTimer>

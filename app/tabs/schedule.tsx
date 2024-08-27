@@ -15,6 +15,8 @@ import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEff
 
 export default function ScheduleScreen({ navigation }) {
   const [uniqueCourses, setUniqueCourses] = useState([]);
+
+  
   const [classTimes, setClassTimes] = useState({ classes: [] });
   const [loading, setLoading] = useState(true);
   const [noSchoolToday, setNoSchoolToday] = useState(false);
@@ -112,6 +114,11 @@ export default function ScheduleScreen({ navigation }) {
           }
         }
       }
+
+      //filter out PE Athletics as it is not a class
+      uniqueCourses = uniqueCourses.filter((course) => {
+        return course.getName() !== "PE Athletics";
+      });
 
       uniqueCourses.sort((a, b) => {
         let timeA = a.getStartTime();
