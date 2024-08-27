@@ -3,7 +3,7 @@
     "name": "Fremont",
     "slug": "fremont-app",
     "owner": "mmortada685",
-    "version": "0.51",
+    "version": "0.53",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "fhs",

@@ -4,6 +4,7 @@ import Course
 
 import Student from '@/hooks/InfiniteCampus/InfiniteCampusStudent';
 import { brunchSchedule, lunchSchedule } from '@/constants/miscSchedule';
+import { createIconSet } from '@expo/vector-icons';
 
 export default class InfiniteCampus {
     public name: string | undefined;
@@ -98,6 +99,7 @@ export default class InfiniteCampus {
         });
 
         let dataForDay = await responseDay.json();
+        console.log(dataForDay);
         if (dataForDay.length === 0) {
             return "No school today";
         }
@@ -109,12 +111,10 @@ export default class InfiniteCampus {
         for (let i = 0; i < data.length; i++) {
             for (let j = 0; j < data[i]['sectionPlacements'].length; j++) {
                 let periodScheduleID = data[i]['sectionPlacements'][j]['periodScheduleID'];
-                todayPeriodScheduleName = data[i]['sectionPlacements'][j]['periodScheduleName'];
                 let term = data[i]['sectionPlacements'][j]['termName'];
-
                 // COMPARE END DATES TO CURRENT DATE TO DETERMINE THE CURRENT TERM
-
                 if (periodScheduleID === todayPeriodScheduleID) {
+                    todayPeriodScheduleName = data[i]['sectionPlacements'][j]['periodScheduleName'];
                     courses.push(new Course(
                         data[i]['courseName'],
                         data[i]['sectionPlacements'][j]['teacherDisplay'],
