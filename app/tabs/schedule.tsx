@@ -129,14 +129,14 @@ export default function ScheduleScreen({ navigation }) {
 
   useFocusEffect(
     useCallback(() => {
-      setRerenderClock(rerenderClock + 1);
+      setRerenderClock((prev) => prev + 1);
       fetchData();
     }, [])
   );
 
   useEffect(() => { 
     const interval = setInterval(() => {
-      setRerenderClock(rerenderClock + 1);
+      setRerenderClock((prev) => prev + 1);
       fetchData();
     }, 60000);
     return () => clearInterval(interval);

@@ -4,6 +4,7 @@ import { Dimensions, Text } from 'react-native';
 
 const getCurrentTimeInSeconds = () => {
   const now = new Date();
+  // return mock data
   return now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
 };
 
@@ -53,7 +54,7 @@ const calculateTimes = (classTimes) => {
   };
 };
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const ClassCountdown = ({ time, keyNumber }) => {
   const initialCalculation = calculateTimes(time);
@@ -73,16 +74,15 @@ const ClassCountdown = ({ time, keyNumber }) => {
       setTotalClassDuration(totalClassDuration);
       setIsClassOngoing(isClassOngoing);
       setAfterSchool(afterSchool);
+
     }, 1000); // Update every second
 
     return () => clearInterval(interval);
   }, [time]);
 
-  // responsive size and fontSize
   const timerSize = width > 350 ? width * 0.57 : width * 0.8;
   const baseFontSize = width > 350 ? width * 0.06 : width * 0.08;
-  const largeFontSize = baseFontSize * 1.2; // Increase the font size for the countdown display
-
+  const largeFontSize = baseFontSize * 1.2; 
 
   return (
     <CountdownCircleTimer
@@ -93,10 +93,25 @@ const ClassCountdown = ({ time, keyNumber }) => {
       colors={['#8B0000', '#8B0000']}
       colorsTime={[0, 0]}
       size={timerSize}
-      strokeWidth={timerSize * 0.064} // 16/250 ratio for different sizes
-      trailStrokeWidth={timerSize * 0.06} // 15/250 ratio for different sizes
+      strokeWidth={timerSize * 0.064} 
+      trailStrokeWidth={timerSize * 0.06} 
       trailColor="rgba(233, 233, 233, 1)"
-      
+      onComplete={(totalElapsedTime) => {
+        const updatedTimeData = calculateTimes(time);
+        setCurrentClassRemainingTime(updatedTimeData.currentClassRemainingTime);
+        setNextClassRemainingTime(updatedTimeData.nextClassRemainingTime);
+        setBreakDuration(updatedTimeData.breakDuration);
+        setTotalClassDuration(updatedTimeData.totalClassDuration);
+        setIsClassOngoing(updatedTimeData.isClassOngoing);
+        setAfterSchool(updatedTimeData.afterSchool);
+
+        return { 
+          shouldRepeat: !updatedTimeData.afterSchool,
+          newInitialRemainingTime: updatedTimeData.isClassOngoing 
+            ? updatedTimeData.currentClassRemainingTime 
+            : updatedTimeData.nextClassRemainingTime 
+        };
+      }}
     >
       {() => (
         <Text style={{ 
@@ -106,11 +121,21 @@ const ClassCountdown = ({ time, keyNumber }) => {
           textAlign: 'center', 
           fontFamily: 'Inter-Bold' 
         }}>
-          {afterSchool
-            ? "After School"
-            : isClassOngoing
-            ? `${Math.ceil(currentClassRemainingTime / 60 - 1)}:${currentClassRemainingTime % 60 < 10 ? '0' : ''}${currentClassRemainingTime % 60}`
-            : `Next class in ${'\n'}${Math.ceil(nextClassRemainingTime / 60 - 1)}:${nextClassRemainingTime % 60 < 10 ? '0' : ''}${nextClassRemainingTime % 60}`}
+          {
+            afterSchool
+              ? "After School"
+              : isClassOngoing
+              ? `${Math.floor(currentClassRemainingTime / 3600) > 0 
+                  ? `${Math.floor(currentClassRemainingTime / 3600)}:` 
+                  : ''}${Math.floor((currentClassRemainingTime % 3600) / 60)}:${currentClassRemainingTime % 60 < 10 
+                  ? '0' 
+                  : ''}${currentClassRemainingTime % 60}`
+              : `Next class in ${'\n'}${Math.floor(nextClassRemainingTime / 3600) > 0 
+                  ? `${Math.floor(nextClassRemainingTime / 3600)}:` 
+                  : ''}${Math.floor((nextClassRemainingTime % 3600) / 60)}:${nextClassRemainingTime % 60 < 10 
+                  ? '0' 
+                  : ''}${nextClassRemainingTime % 60}`
+          }
         </Text>
       )}
     </CountdownCircleTimer>
