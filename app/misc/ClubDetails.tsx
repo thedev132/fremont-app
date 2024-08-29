@@ -41,7 +41,7 @@ export default function ClubDetails({ route, navigation }) {
             try {
                 let accessToken = await AsyncStorage.getItem('accessToken');
                 console.log(accessToken)
-                let response = await fetch(`https://fremont-app-backend.vercel.app/api/orgs/${id}/`, {
+                let response = await fetch(`https://fremont-app.vercel.app/api/orgs/${id}/`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

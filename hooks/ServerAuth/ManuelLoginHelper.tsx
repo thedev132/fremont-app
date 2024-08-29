@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const register = async (email: string, password: string) => {
     try {
-        let response  = await fetch("https://fremont-app-backend.vercel.app/api/auth/users/", {
+        let response  = await fetch("https://fremont-app.vercel.app/api/auth/users/", {
             "headers": {
                 "content-type": "application/json",
                 },
@@ -21,7 +21,7 @@ export const register = async (email: string, password: string) => {
 
 export const login = async (email: string, password: string) => {
     try {
-        let response  = await fetch("https://fremont-app-backend.vercel.app/api/auth/jwt/create", {
+        let response  = await fetch("https://fremont-app.vercel.app/api/auth/jwt/create", {
             "headers": {
                 "content-type": "application/json",
                 },

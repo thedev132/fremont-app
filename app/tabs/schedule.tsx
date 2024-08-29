@@ -44,7 +44,7 @@ export default function ScheduleScreen({ navigation }) {
       if (student !== "No ID") {
         await AsyncStorage.setItem('gradYear', student.getGrade());
         let year = getGraduationYear(Number(student.getGrade()));
-        await fetch("https://fremont-app-backend.vercel.app/api/users/me/", {
+        await fetch("https://fremont-app.vercel.app/api/users/me/", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

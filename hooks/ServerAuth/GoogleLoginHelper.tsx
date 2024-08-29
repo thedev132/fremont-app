@@ -6,7 +6,7 @@ export const getToken = async (state, code) => {
     body.append('code', code);
     body.append('state', state);
     console.log(body.toString());
-    let response = await fetch("https://fremont-app-backend.vercel.app/api/auth/o/google/", {
+    let response = await fetch("https://fremont-app.vercel.app/api/auth/o/google/", {
       "headers": {
         "content-type": "application/x-www-form-urlencoded",
       },

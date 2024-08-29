@@ -3,7 +3,7 @@ import Organization from "./Organization";
 
 export default async function getAllOrganizations(page: number) {
     let accessToken = await AsyncStorage.getItem('accessToken');
-    const response = await fetch(`https://fremont-app-backend.vercel.app/api/orgs/?page=${page}`, {
+    const response = await fetch(`https://fremont-app.vercel.app/api/orgs/?page=${page}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

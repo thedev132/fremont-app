@@ -42,7 +42,7 @@ export default function AddClubScreen({ navigation }) {
       }));
 
           let accessToken = await AsyncStorage.getItem('accessToken');
-          const response = await fetch(`https://fremont-app-backend.vercel.app/api/users/me/orgs/`, {
+          const response = await fetch(`https://fremont-app.vercel.app/api/users/me/orgs/`, {
               method: "POST",
               headers: {
                   'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export default function AddClubScreen({ navigation }) {
         await AsyncStorage.setItem('orgs', JSON.stringify(orgs));
 
         let accessToken = await AsyncStorage.getItem('accessToken');
-        const response = await fetch(`https://fremont-app-backend.vercel.app/api/users/me/orgs/${id}/`, {
+        const response = await fetch(`https://fremont-app.vercel.app/api/users/me/orgs/${id}/`, {
             method: "DELETE",
             headers: {
                 "Authorization": `Bearer ${accessToken}`, // Authorization header

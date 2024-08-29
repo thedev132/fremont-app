@@ -4,7 +4,7 @@ import Post from "./Post";
 
 export default async function getAllPosts() {
     let accessToken = await AsyncStorage.getItem('accessToken');
-    const response = await fetch("https://fremont-app-backend.vercel.app/api/posts/", {
+    const response = await fetch("https://fremont-app.vercel.app/api/posts/", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
