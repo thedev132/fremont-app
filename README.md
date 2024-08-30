@@ -21,7 +21,7 @@ If you have logged into the app before, you are likely already an admin for any 
 
 ## Managing Organizations
 
-You can manage general information about your Organizations on the [_Organizations_](https://fremont-app-backend.vercel.app/admin/core/organization/) tab.
+You can manage general information about your Organizations on the [_Organizations_](https://fremont-app.vercel.app/admin/core/organization/) tab.
 
 ![Organization Management](./organization.png)
 
