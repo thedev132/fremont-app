@@ -1,5 +1,7 @@
 # Admin Panel Instruction Manual
 
+Detailed Document: [here](https://docs.google.com/document/d/1KL02aFw8MbDz0fC9H44jFqCn7H_pEydYMxQeoiUJFIU/edit)
+
 Welcome to the Fremont App Admin Panel Instruction Manual! This guide provides a comprehensive overview of the app's features and instructions for club officers, advisors, ASB members, and staff. However, anyone interested is welcome to read it!
 
 To access the table of contents, click the list button in the top left corner.
