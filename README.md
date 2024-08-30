@@ -15,7 +15,7 @@ For any questions, please reach out to:
 
 The _Admin Panel_ is a website where club officers, advisors, ASB members, and staff can manage various features of the app.
 
-To access the admin panel, visit [https://fremont-app-backend.vercel.app/admin/](https://tinyurl.com/fremont-app). Sign in using your FUHSD Google Account by clicking the _Sign in with Google_ button. While anyone can sign in, you must be added as an admin to at least one _Organization_ (such as ASB, graduating classes, or clubs) to perform any administrative actions.
+To access the admin panel, visit [https://fremont-app.vercel.app/admin/](https://tinyurl.com/fremont-app). Sign in using your FUHSD Google Account by clicking the _Sign in with Google_ button. While anyone can sign in, you must be added as an admin to at least one _Organization_ (such as ASB, graduating classes, or clubs) to perform any administrative actions.
 
 If you have logged into the app before, you are likely already an admin for any clubs where you are an officer. If not, please contact us (see contact information above) so we can grant you access.
 
