@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, View, Dimensions } from 'react-native';
+import { ScrollView, Text, View, Dimensions, ActivityIndicator } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import makeUser from '@/hooks/InfiniteCampus/MakeUser';
 import { DataTable } from 'react-native-paper';

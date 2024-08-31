@@ -40,6 +40,15 @@ export default function AddClubScreen({ navigation }) {
             return club;
           }
       }));
+        let me = await getUserMe();
+        let myOrgs = me.getOrgs();
+        await AsyncStorage.setItem('myOrgs', JSON.stringify(myOrgs.sort(compareByName)));
+
+        let orgs: Organization[] = [];
+        orgs = await getAllOrganizations(1);
+        // Sort orgs alphabetically by name
+        orgs = orgs.sort(compareByName);
+        await AsyncStorage.setItem('orgs', JSON.stringify(orgs));
 
           let accessToken = await AsyncStorage.getItem('accessToken');
           const response = await fetch(`https://fremont-app.vercel.app/api/users/me/orgs/`, {
@@ -100,6 +109,7 @@ export default function AddClubScreen({ navigation }) {
 
 
 const compareByName = (a, b) => a.name.localeCompare(b.name);
+
 useEffect(() => {
   const fetchData = async () => {
       try {
