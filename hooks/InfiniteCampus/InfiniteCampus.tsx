@@ -3,8 +3,9 @@ import Course
  from './InfiniteCampusCourse';
 
 import Student from '@/hooks/InfiniteCampus/InfiniteCampusStudent';
-import { brunchSchedule, lunchSchedule } from '@/constants/miscSchedule';
+import { brunchSchedule, lunchSchedule, RallySchedule } from '@/constants/miscSchedule';
 import { createIconSet } from '@expo/vector-icons';
+import { isDateInRange } from '@/constants/utils';
 
 export default class InfiniteCampus {
     public name: string | undefined;
@@ -99,7 +100,6 @@ export default class InfiniteCampus {
         });
 
         let dataForDay = await responseDay.json();
-        console.log(dataForDay);
         if (dataForDay.length === 0) {
             return "No school today";
         }
@@ -112,8 +112,13 @@ export default class InfiniteCampus {
             for (let j = 0; j < data[i]['sectionPlacements'].length; j++) {
                 let periodScheduleID = data[i]['sectionPlacements'][j]['periodScheduleID'];
                 let term = data[i]['sectionPlacements'][j]['termName'];
+                let startTerm = data[i]['sectionPlacements'][j]['term']['startDate'];
+                let endTerm = data[i]['sectionPlacements'][j]['term']['endDate'];
+                let currentDate = date.toString();
+                let isInTermRange = isDateInRange(startTerm, endTerm, currentDate);
+
                 // COMPARE END DATES TO CURRENT DATE TO DETERMINE THE CURRENT TERM
-                if (periodScheduleID === todayPeriodScheduleID) {
+                if (periodScheduleID === todayPeriodScheduleID && isInTermRange) {
                     todayPeriodScheduleName = data[i]['sectionPlacements'][j]['periodScheduleName'];
                     courses.push(new Course(
                         data[i]['courseName'],
@@ -128,12 +133,16 @@ export default class InfiniteCampus {
             }
         }
 
-        // Add brunch and lunch to the schedule based on today's period schedule name
+        // Add brunch, lunch, and misc to the schedule based on today's period schedule name
         if (brunchSchedule[todayPeriodScheduleName]) {
             courses.push(brunchSchedule[todayPeriodScheduleName]);
         }
         if (lunchSchedule[todayPeriodScheduleName]) {
             courses.push(lunchSchedule[todayPeriodScheduleName]);
+        }
+
+        if (RallySchedule[todayPeriodScheduleName]) {
+            courses.push(RallySchedule[todayPeriodScheduleName]);
         }
 
         return courses;
@@ -167,7 +176,6 @@ export default class InfiniteCampus {
             method: 'GET',
           });
           let data = await response.json();
-          console.log(data);
           let studentID = data[0]['studentNumber'] ?? '';
           if (studentID == '') {
             return "No ID";

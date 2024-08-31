@@ -4,7 +4,6 @@ import { Dimensions, Text } from 'react-native';
 
 const getCurrentTimeInSeconds = () => {
   const now = new Date();
-  // return mock data
   return now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
 };
 
@@ -16,6 +15,7 @@ const calculateTimes = (classTimes) => {
   let breakDuration = 0;
   let prevClassEndInSeconds = 0;
   let totalClassDuration = 0;
+  let firstClassStartsIn = Infinity; // Time until the first class starts
 
   const classData = classTimes["classes"].map(cls => {
     const [startHours, startMinutes, startSeconds] = cls["start"].split(':').map(Number);
@@ -27,9 +27,10 @@ const calculateTimes = (classTimes) => {
     if (currentTimeInSeconds >= classStartInSeconds && currentTimeInSeconds <= classEndInSeconds) {
       isClassOngoing = true;
       currentClassRemainingTime = classEndInSeconds - currentTimeInSeconds;
-      totalClassDuration = classEndInSeconds - classStartInSeconds; // Set duration of the ongoing class
+      totalClassDuration = classEndInSeconds - classStartInSeconds;
     } else if (currentTimeInSeconds < classStartInSeconds) {
       nextClassRemainingTime = Math.min(nextClassRemainingTime, classStartInSeconds - currentTimeInSeconds);
+      firstClassStartsIn = Math.min(firstClassStartsIn, classStartInSeconds - currentTimeInSeconds);
       if (prevClassEndInSeconds > 0) {
         breakDuration = Math.min(breakDuration || Infinity, classStartInSeconds - prevClassEndInSeconds);
       }
@@ -50,7 +51,8 @@ const calculateTimes = (classTimes) => {
     breakDuration,
     isClassOngoing,
     afterSchool,
-    totalClassDuration // Return the total class duration
+    totalClassDuration,
+    firstClassStartsIn // Return the time until the first class starts
   };
 };
 
@@ -64,16 +66,18 @@ const ClassCountdown = ({ time, keyNumber }) => {
   const [totalClassDuration, setTotalClassDuration] = useState(initialCalculation.totalClassDuration);
   const [isClassOngoing, setIsClassOngoing] = useState(initialCalculation.isClassOngoing);
   const [afterSchool, setAfterSchool] = useState(initialCalculation.afterSchool);
+  const [firstClassStartsIn, setFirstClassStartsIn] = useState(initialCalculation.firstClassStartsIn);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const { currentClassRemainingTime, nextClassRemainingTime, breakDuration, totalClassDuration, isClassOngoing, afterSchool } = calculateTimes(time);
+      const { currentClassRemainingTime, nextClassRemainingTime, breakDuration, totalClassDuration, isClassOngoing, afterSchool, firstClassStartsIn } = calculateTimes(time);
       setCurrentClassRemainingTime(currentClassRemainingTime);
       setNextClassRemainingTime(nextClassRemainingTime);
       setBreakDuration(breakDuration);
       setTotalClassDuration(totalClassDuration);
       setIsClassOngoing(isClassOngoing);
       setAfterSchool(afterSchool);
+      setFirstClassStartsIn(firstClassStartsIn);
 
     }, 1000); // Update every second
 
@@ -84,10 +88,12 @@ const ClassCountdown = ({ time, keyNumber }) => {
   const baseFontSize = width > 350 ? width * 0.06 : width * 0.08;
   const largeFontSize = baseFontSize * 1.2; 
 
+  const shouldStartCountdown = firstClassStartsIn <= 5400; // Check if the first class is within 1 hour and 30 minutes
+
   return (
     <CountdownCircleTimer
       key={keyNumber}
-      isPlaying={true}
+      isPlaying={shouldStartCountdown}
       duration={isClassOngoing ? totalClassDuration : breakDuration}
       initialRemainingTime={isClassOngoing ? currentClassRemainingTime : nextClassRemainingTime}
       colors={['#8B0000', '#8B0000']}
@@ -104,6 +110,7 @@ const ClassCountdown = ({ time, keyNumber }) => {
         setTotalClassDuration(updatedTimeData.totalClassDuration);
         setIsClassOngoing(updatedTimeData.isClassOngoing);
         setAfterSchool(updatedTimeData.afterSchool);
+        setFirstClassStartsIn(updatedTimeData.firstClassStartsIn);
 
         return { 
           shouldRepeat: !updatedTimeData.afterSchool,
