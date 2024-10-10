@@ -89,7 +89,7 @@ export default function RootLayout() {
         }
         return pushTokenString;
       } catch (e: unknown) {
-        handleRegistrationError(`${e}`);
+        // handleRegistrationError(`${e}`);
       }
   }
   

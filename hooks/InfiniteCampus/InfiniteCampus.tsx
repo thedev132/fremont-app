@@ -20,18 +20,15 @@ export default class InfiniteCampus {
 
     public async login() {
           try {
-            const response = await fetch(`https://fuhsd.infinitecampus.org/campus/verify.jsp?nonBrowser=true&username=${this.name}&password=${this.password}&appName=fremont`, {
-              method: 'GET',
-              credentials: 'include'
+            const response = await fetch("https://fuhsd.infinitecampus.org/campus/verify.jsp", {
+              "body": `username=${this.name}&password=${this.password}&portalUrl=portal%2Fstudents%2Ffremont.jsp%3F%26rID%3D0.514013606558769&appName=fremont`,
+              "method": "POST"
             });
-            let result = await response.text()
-            if (result == "password-error") {
+            let check = await this.checkLoggedIn();
+            if (!check) {
               return "password"
             }
-            if (result.includes("captcha")) {
-              return "captcha"
-            }
-            if (result.includes("success")) {
+            if (check) {
               return "success"
             }
             return Promise.resolve();
@@ -39,6 +36,22 @@ export default class InfiniteCampus {
             return Promise.reject(err);
           }
     }
+
+    public async checkLoggedIn() {
+      try {
+        const response = await fetch(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, {
+          method: 'GET',
+        });
+        if (response.ok) {
+          return true;
+        }
+
+      }
+      catch (err) {
+        return Promise.reject(err);
+      }
+    }
+
 
     public async getGrades() {
       try {

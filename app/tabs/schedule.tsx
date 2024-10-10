@@ -202,7 +202,7 @@ export default function ScheduleScreen({ navigation }) {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   {course.getTeacherName() !== undefined && (
                     <Text style={{ color: '#fff' }}>
-                      {course.getTeacherName()?.replace(/,/g, '').trim().split(/\s+/).reverse().join(' ')}
+                      {course.getTeacherName()?.replace(/,/g, '').trim().split(/\s+/).reverse().join(' ').replace(/^(\S+)\s(\S+)\s(.+)/, '$2 $1 $3')}
                     </Text>
                   )}
                   {course.getRoom() !== undefined && course.getRoom() !== "" && (
@@ -255,7 +255,7 @@ export default function ScheduleScreen({ navigation }) {
                   </Text>
                 )}
                 <Text style={{ color: '#fff' }}>
-                  {' '}{course.getTeacherName()?.replace(/,/g, '').trim().split(/\s+/)[0]}
+                {' '}{course.getTeacherName()?.replace(/,/g, '').trim().split(/\s+/)[0]}
                 </Text>
                 {course.getRoom() !== undefined && course.getRoom() !== "" && (
                   <Text style={{ color: '#fff' }}> • RM: {course.getRoom()}</Text>
