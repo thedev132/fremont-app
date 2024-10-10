@@ -144,18 +144,18 @@ export default function GradesScreen() {
     return 'F';
   };
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size='large' color='#BF1B1B' />
+      </View>
+    );
+  }
   if (!gradesReleased) {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <Text style={{ fontSize: 20, textAlign: 'center' }}>Your grades haven't been posted yet!</Text>
         <Text style={{ fontSize: 20, textAlign: 'center' }}>Check back after the first grading period</Text>
-      </View>
-    );
-  }
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size='large' color='#BF1B1B' />
       </View>
     );
   }

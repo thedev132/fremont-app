@@ -18,28 +18,37 @@ export default function AddClubScreen({ navigation }) {
     const [noMoreData, setNoMoreData] = useState(false);
     const [allOrgs, setAllOrgs] = useState<Organization[]>([]); // Store all organizations here
 
+    const updateAddClub = async (id, name, type) => {
+        try {
+            let newClub = new NestedOrganization(String(id), name, type);
+  
+            // Define a comparison function for sorting
+            const compareByName = (a, b) => a.name.localeCompare(b.name);
+    
+            // Update the list of my clubs and sort it alphabetically
+            setMyClubs((prevClubs) => {
+                // Create a new list with the added club
+                const updatedClubs = [...prevClubs, newClub];
+                
+                // Sort the list alphabetically by name
+                return updatedClubs.sort(compareByName);
+            });
+    
+            // update the list of other clubs as needed
+            setClubs((prevClubs) => prevClubs.filter(club => {
+              if (club.getId() != String(id)) {
+                return club;
+            }
+          }));
+        }
+        catch (error) {
+            console.error('Error adding club:', error);
+        }
+    }
+
     async function addClub(id: number, name: string, type: string) {
       try {
-        let newClub = new NestedOrganization(String(id), name, type);
-  
-        // Define a comparison function for sorting
-        const compareByName = (a, b) => a.name.localeCompare(b.name);
-
-        // Update the list of my clubs and sort it alphabetically
-        setMyClubs((prevClubs) => {
-            // Create a new list with the added club
-            const updatedClubs = [...prevClubs, newClub];
-            
-            // Sort the list alphabetically by name
-            return updatedClubs.sort(compareByName);
-        });
-
-        // update the list of other clubs as needed
-        setClubs((prevClubs) => prevClubs.filter(club => {
-          if (club.getId() != String(id)) {
-            return club;
-          }
-      }));
+        await updateAddClub(id, name, type);
         let me = await getUserMe();
         let myOrgs = me.getOrgs();
         await AsyncStorage.setItem('myOrgs', JSON.stringify(myOrgs.sort(compareByName)));
@@ -50,8 +59,8 @@ export default function AddClubScreen({ navigation }) {
         orgs = orgs.sort(compareByName);
         await AsyncStorage.setItem('orgs', JSON.stringify(orgs));
 
-          let accessToken = await AsyncStorage.getItem('accessToken');
-          const response = await fetch(`https://fremont-app.vercel.app/api/users/me/orgs/`, {
+        let accessToken = await AsyncStorage.getItem('accessToken');
+        const response = await fetch(`https://fremont-app.vercel.app/api/users/me/orgs/`, {
               method: "POST",
               headers: {
                   'Content-Type': 'application/json',
@@ -64,26 +73,30 @@ export default function AddClubScreen({ navigation }) {
           console.error('Error adding club:', error);
       }
   }
+
+  const updateRemoveClub = async (id, name, type) => {
+    setMyClubs((prevClubs) => prevClubs.filter(club => club.getId() != String(id)));
+
+    // Add the removed club back to the list of other clubs
+    let newClub = new Organization(String(id), name, type, "fetch", "fetch", "fetch", "fetch");
+
+    // Define a comparison function for sorting
+    const compareByName = (a, b) => a.name.localeCompare(b.name);
+
+    // Update the clubs list and sort it alphabetically
+    setClubs((prevClubs) => {
+        // Create a new list with the added club
+        const updatedClubs = [...prevClubs, newClub];
+        
+        // Sort the list alphabetically by name
+        return updatedClubs.sort(compareByName);
+    });
+}
   
 
   async function removeClub(id: number, name: string, type: string) {
     try {
-        setMyClubs((prevClubs) => prevClubs.filter(club => club.getId() != String(id)));
-
-        // Add the removed club back to the list of other clubs
-        let newClub = new Organization(String(id), name, type, "fetch", "fetch", "fetch", "fetch");
-
-        // Define a comparison function for sorting
-        const compareByName = (a, b) => a.name.localeCompare(b.name);
-
-        // Update the clubs list and sort it alphabetically
-        setClubs((prevClubs) => {
-            // Create a new list with the added club
-            const updatedClubs = [...prevClubs, newClub];
-            
-            // Sort the list alphabetically by name
-            return updatedClubs.sort(compareByName);
-        });
+        await updateRemoveClub(id, name, type);
         let me = await getUserMe();
         let myOrgs = me.getOrgs();
         await AsyncStorage.setItem('myOrgs', JSON.stringify(myOrgs.sort(compareByName)));
