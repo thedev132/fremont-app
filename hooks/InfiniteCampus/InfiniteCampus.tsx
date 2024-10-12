@@ -6,6 +6,7 @@ import Student from '@/hooks/InfiniteCampus/InfiniteCampusStudent';
 import { brunchSchedule, lunchSchedule, RallySchedule } from '@/constants/miscSchedule';
 import { createIconSet } from '@expo/vector-icons';
 import { isDateInRange } from '@/constants/utils';
+import CookieManager from '@react-native-cookies/cookies';
 
 export default class InfiniteCampus {
     public name: string | undefined;
@@ -20,19 +21,29 @@ export default class InfiniteCampus {
 
     public async login() {
           try {
+            await CookieManager.clearAll();
             const response = await fetch("https://fuhsd.infinitecampus.org/campus/verify.jsp", {
               "headers": {
                 "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
                 "accept-language": "en-US,en;q=0.9",
+                "cache-control": "max-age=0",
+                "content-type": "application/x-www-form-urlencoded",
+                "priority": "u=0, i",
+                "sec-fetch-dest": "document",
+                "sec-fetch-mode": "navigate",
+                "sec-fetch-site": "same-origin",
+                "sec-fetch-user": "?1",
+                "upgrade-insecure-requests": "1"
               },
-              "referrer": "https://fuhsd.infinitecampus.org/campus/portal/students/fremont.jsp?status=login",
+              "referrer": "https://fuhsd.infinitecampus.org/campus/portal/students/fremont.jsp?status=logoff",
               "referrerPolicy": "strict-origin-when-cross-origin",
-              "body": `nonBrowser=true&username=${this.name}&password=${this.password}&appName=fremont`,
+              "body": `username=${this.name}&password=${this.password}&portalUrl=portal%2Fstudents%2Ffremont.jsp%3F%26rID%3D0.09995412410637872&appName=fremont&url=nav-wrapper&lang=en&portalLoginPage=students`,
               "method": "POST",
               "mode": "cors",
               "credentials": "include"
             });
             let check = await this.checkLoggedIn();
+            console.log(check);
             if (!check) {
               return "password"
             }
@@ -49,6 +60,7 @@ export default class InfiniteCampus {
       try {
         const response = await fetch(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, {
           method: 'GET',
+          credentials: 'include'
         });
         console.log(await response.json());
         if (response.ok) {
@@ -195,10 +207,15 @@ export default class InfiniteCampus {
 
     public async getStudentInfo() {
       try {
+        
           const response = await fetch(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, {
             method: 'GET',
+            credentials: 'include'
           });
+
           let data = await response.json();
+          console.log('data');
+          console.log(data);
           let studentID = data[0]['studentNumber'] ?? '';
           if (studentID == '') {
             return "No ID";

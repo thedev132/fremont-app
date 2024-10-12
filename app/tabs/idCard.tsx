@@ -29,7 +29,6 @@ export default function IDCardScreen() {
                     setIdReleased(false);
                     return;
                 }
-                console.log(student);
                 if (storedStudentInfo === null) {
                     setStudentInfo(student);
                 }
@@ -39,6 +38,8 @@ export default function IDCardScreen() {
             }
         }
         fetchData();
+        console.log('ID Card Screen');
+        console.log(studentInfo);
 
     }, []);
 
