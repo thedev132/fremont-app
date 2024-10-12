@@ -57,7 +57,7 @@ export default function ScheduleScreen({ navigation }) {
 
     try {
       let user = await makeUser();
-      await user.login();
+      let login = await user.login();
       let courses = await getCourses(user);
       setUniqueCourses(courses);
 

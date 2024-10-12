@@ -21,8 +21,16 @@ export default class InfiniteCampus {
     public async login() {
           try {
             const response = await fetch("https://fuhsd.infinitecampus.org/campus/verify.jsp", {
-              "body": `username=${this.name}&password=${this.password}&portalUrl=portal%2Fstudents%2Ffremont.jsp%3F%26rID%3D0.514013606558769&appName=fremont`,
-              "method": "POST"
+              "headers": {
+                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                "accept-language": "en-US,en;q=0.9",
+              },
+              "referrer": "https://fuhsd.infinitecampus.org/campus/portal/students/fremont.jsp?status=login",
+              "referrerPolicy": "strict-origin-when-cross-origin",
+              "body": `nonBrowser=true&username=${this.name}&password=${this.password}&appName=fremont`,
+              "method": "POST",
+              "mode": "cors",
+              "credentials": "include"
             });
             let check = await this.checkLoggedIn();
             if (!check) {
@@ -42,9 +50,11 @@ export default class InfiniteCampus {
         const response = await fetch(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, {
           method: 'GET',
         });
+        console.log(await response.json());
         if (response.ok) {
           return true;
         }
+        return false;
 
       }
       catch (err) {
@@ -254,3 +264,4 @@ export default class InfiniteCampus {
     }
 
 }
+
