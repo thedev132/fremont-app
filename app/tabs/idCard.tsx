@@ -1,4 +1,4 @@
-import InfiniteCampus from '@/hooks/InfiniteCampus/InfiniteCampus';
+import InfiniteCampus, { useStudentInfo } from '@/hooks/InfiniteCampus/InfiniteCampus';
 import Student from '@/hooks/InfiniteCampus/InfiniteCampusStudent';
 import { useEffect, useState } from 'react';
 import { Text, View, Image } from 'react-native';
@@ -7,39 +7,61 @@ import Divider from '@/components/Divider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import makeUser from '@/hooks/InfiniteCampus/MakeUser';
+import useSWR from 'swr';
 
 export default function IDCardScreen() {
     
     const [studentInfo, setStudentInfo] = useState<Student>();
     const [idReleased, setIdReleased] = useState(true);
+
+    const fetcher = async (url: string, options: RequestInit = {}) => {
+        const res = await fetch(url, options);
+        if (!res.ok) {
+          throw new Error(`Error fetching data: ${res.statusText}`);
+        }
+        return res.json();
+      };
+
+    const { data, error } = useSWR(
+        "https://fuhsd.infinitecampus.org/campus/api/portal/students",
+        fetcher
+    );
+
+    const personID = data?.[0]?.personID; // Adjust based on actual structure
+    const { data: profilePic, mutate: reloadProfile } = useSWR(
+    personID
+        ? `https://fuhsd.infinitecampus.org/campus/personPicture.jsp?personID=${personID}&alt=teacherApp&img=large`
+        : null,
+    async (url) => {
+        const res = await fetch(url, { method: "GET" });
+        const blob = await res.blob();
+        return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+        });
+    })
     useEffect(() => {
 
         const fetchData = async () => {
-            let storedStudentInfo = await AsyncStorage.getItem('studentInfo');
-            if (storedStudentInfo !== null) {
-                let info = JSON.parse(storedStudentInfo);
-                let student = new Student(info['firstName'], info['lastName'], info['grade'], info['studentID'], info['profilePicture']);
-                setStudentInfo(student);
-            }
-            let user = await makeUser();
-            user.login();
+            // let user = await makeUser();
+            // user.login();
             try {
-                let student = await user.getStudentInfo();
+                let student = useStudentInfo(data).student;
                 if (student == "No ID") {
                     setIdReleased(false);
                     return;
                 }
-                if (storedStudentInfo === null) {
-                    setStudentInfo(student);
-                }
-                await AsyncStorage.setItem('studentInfo', JSON.stringify(student));
+                setStudentInfo(student);
             } catch (error) {
                 // Handle error
             }
         }
         fetchData();
-        console.log('ID Card Screen');
         console.log(studentInfo);
+        reloadProfile();
+        console.log(profilePic)
 
     }, []);
 
@@ -54,7 +76,7 @@ export default function IDCardScreen() {
     return (
         <View style={{flex:1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff'}}>
             <View style={{alignItems: 'center', marginBottom: 30}}>
-                <Image style={{width: 100, height: 150, marginBottom: 20}} source={{uri: studentInfo?.getProfilePicture()}} />
+                <Image style={{width: 100, height: 150, marginBottom: 20}} source={{uri: profilePic}} />
                 <Text style={{color: 'black', fontSize: 32}}> {studentInfo?.getFullName()} </Text>
                 <Divider width={300} marginVertical={6}/>
                 <Text style={{color: 'black'}}>Grade: {studentInfo?.getGrade().charAt(0) === '0' ? studentInfo?.getGrade()?.slice(1) : studentInfo?.getGrade()} | Student</Text>

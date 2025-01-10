@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, Text, View, Dimensions, ActivityIndicator } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import makeUser from '@/hooks/InfiniteCampus/MakeUser';
 import { DataTable } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
+import { useGrades } from '@/hooks/InfiniteCampus/InfiniteCampus';
+import useSWR from 'swr';
 
 interface Grade {
   taskName: string;
@@ -21,11 +22,25 @@ export default function GradesScreen() {
   const [gradesReleased, setGradesReleased] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  const fetcher = async (url: string, options: RequestInit = {}) => {
+    const res = await fetch(url, options);
+    if (!res.ok) {
+      throw new Error(`Error fetching data: ${res.statusText}`);
+    }
+    return res.json();
+  };
+
+  
+  const { data, error } = useSWR(
+    "https://fuhsd.infinitecampus.org/campus/resources/portal/grades/",
+    fetcher
+  );
+
   useEffect(() => {
     setLoading(true);
     const fetchGrades = async () => {
-      let user = await makeUser();
-      let grades = await user.getGrades();
+      let grades = await useGrades(data);
+      console.log("grades", grades);
       if (grades == 'No grades') {
         setLoading(false);
         setGradesReleased(false);

@@ -1,284 +1,167 @@
-import React from 'react';
-import Course
- from './InfiniteCampusCourse';
-
-import Student from '@/hooks/InfiniteCampus/InfiniteCampusStudent';
-import { brunchSchedule, lunchSchedule, RallySchedule } from '@/constants/miscSchedule';
-import { createIconSet } from '@expo/vector-icons';
-import { isDateInRange } from '@/constants/utils';
 import CookieManager from '@react-native-cookies/cookies';
+import { brunchSchedule, lunchSchedule, RallySchedule } from '@/constants/miscSchedule';
+import Course from './InfiniteCampusCourse';
+import Student from './InfiniteCampusStudent';
+import makeUser from './MakeUser';
 
-export default class InfiniteCampus {
-    public name: string | undefined;
-    public password: string | undefined;
-
-    constructor(name: string, password: string) {
-
-        this.name = name;
-        this.password = password;
-
-    }
-
-    public async login() {
-          try {
-            await CookieManager.clearAll();
-            const response = await fetch("https://fuhsd.infinitecampus.org/campus/verify.jsp", {
-              "headers": {
-                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-                "accept-language": "en-US,en;q=0.9",
-                "cache-control": "max-age=0",
-                "content-type": "application/x-www-form-urlencoded",
-                "priority": "u=0, i",
-                "sec-fetch-dest": "document",
-                "sec-fetch-mode": "navigate",
-                "sec-fetch-site": "same-origin",
-                "sec-fetch-user": "?1",
-                "upgrade-insecure-requests": "1"
-              },
-              "referrer": "https://fuhsd.infinitecampus.org/campus/portal/students/fremont.jsp?status=logoff",
-              "referrerPolicy": "strict-origin-when-cross-origin",
-              "body": `username=${this.name}&password=${this.password}&portalUrl=portal%2Fstudents%2Ffremont.jsp%3F%26rID%3D0.09995412410637872&appName=fremont&url=nav-wrapper&lang=en&portalLoginPage=students`,
-              "method": "POST",
-              "mode": "cors",
-              "credentials": "include"
-            });
-            let check = await this.checkLoggedIn();
-            console.log(check);
-            if (!check) {
-              return "password"
-            }
-            if (check) {
-              return "success"
-            }
-            return Promise.resolve();
-          } catch (err) {
-            return Promise.reject(err);
-          }
-    }
-
-    public async checkLoggedIn() {
-      try {
-        const response = await fetch(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, {
-          method: 'GET',
-          credentials: 'include'
-        });
-        console.log(await response.json());
-        if (response.ok) {
-          return true;
-        }
-        return false;
-
-      }
-      catch (err) {
-        return Promise.reject(err);
-      }
-    }
-
-
-    public async getGrades() {
-      try {
-          const response = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/portal/grades/`, {
-              method: 'GET',
-              credentials: 'include'
-          });
-  
-          let data = await response.json();
-          if (data.length === 0) {
-              return "No grades";
-          }
-  
-          let courses = data[0]['courses'];
-          let gradesDict = {};
-          let hasGrades = false;
-  
-          for (let course of courses) {
-              let courseName = course['courseName'];
-              gradesDict[courseName] = [];
-              
-              for (let gradingTask of course['gradingTasks']) {
-                  if (gradingTask['score']) {
-                      hasGrades = true;
-                  }
-                  gradesDict[courseName].push({
-                      taskName: gradingTask['taskName'],
-                      score: gradingTask['score']
-                  });
-              }
-          }
-  
-          if (!hasGrades) {
-              return "No grades";
-          }
-  
-          return gradesDict;
-      } catch (err) {
-          return Promise.reject(err);
-      }
+const fetcher = async (url: string, options: RequestInit = {}) => {
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    throw new Error(`Error fetching data: ${res.statusText}`);
   }
-  
+  return res.json();
+};
 
+// Clear cookies and perform login
+export const useLogin = async () => {
+  const { email, password } = await makeUser();
+  const login = async () => {
+    await CookieManager.clearAll();
+    const response = await fetch("https://fuhsd.infinitecampus.org/campus/verify.jsp", {
+      headers: {
+        accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "content-type": "application/x-www-form-urlencoded",
+      },
+      referrer: "https://fuhsd.infinitecampus.org/campus/portal/students/fremont.jsp?status=logoff",
+      body: `username=${email}&password=${password}&portalUrl=portal%2Fstudents%2Ffremont.jsp%3F%26rID%3D0.09995412410637872&appName=fremont&url=nav-wrapper&lang=en&portalLoginPage=students`,
+      method: "POST",
+      credentials: "include",
+    });
 
-  public async getSchedule(date: Date | string) {
-    try {
-        let courses = new Array<Course>();
-        const response = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_date=${date}`, {
-            method: 'GET',
-        });
-        let data = await response.json();
-        if (data.length == 0) {
-            return "No courses";
-        }
-        let calendarID = data[0]['calendarID'];
+    const checkLoggedIn = await fetch(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, {
+      method: "GET",
+      credentials: "include",
+    });
 
-        const responseDay = await fetch(`https://fuhsd.infinitecampus.org/campus/resources/calendar/instructionalDay?calendarID=${calendarID}&date=${date}`, {
-            method: 'GET',
-        });
+    return checkLoggedIn.ok ? "success" : "password";
+  };
 
-        let dataForDay = await responseDay.json();
-        if (dataForDay.length === 0) {
-            return "No school today";
-        }
-        let todayPeriodScheduleID = dataForDay[0]['periodScheduleID'];
-        let todayPeriodScheduleName = null
+  return login;
+  login();
+};
 
+// Fetch grades
+export const useGrades = async (data) => {
+  await useLogin();
+  const gradesDict: Record<string, { taskName: string; score: string | null }[]> = {};
+  let hasGrades = false;
 
-        // Process other classes
-        for (let i = 0; i < data.length; i++) {
-            for (let j = 0; j < data[i]['sectionPlacements'].length; j++) {
-                let periodScheduleID = data[i]['sectionPlacements'][j]['periodScheduleID'];
-                let term = data[i]['sectionPlacements'][j]['termName'];
-                let startTerm = data[i]['sectionPlacements'][j]['term']['startDate'];
-                let endTerm = data[i]['sectionPlacements'][j]['term']['endDate'];
-                let currentDate = date.toString();
-                let isInTermRange = isDateInRange(startTerm, endTerm, currentDate);
+  data[0]?.courses.forEach((course: any) => {
+    const courseName = course.courseName;
+    gradesDict[courseName] = [];
 
-                // COMPARE END DATES TO CURRENT DATE TO DETERMINE THE CURRENT TERM
-                if (periodScheduleID === todayPeriodScheduleID && isInTermRange) {
-                    todayPeriodScheduleName = data[i]['sectionPlacements'][j]['periodScheduleName'];
-                    courses.push(new Course(
-                        data[i]['courseName'],
-                        data[i]['sectionPlacements'][j]['teacherDisplay'],
-                        data[i]['roomName'],
-                        data[i]['sectionPlacements'][j]['periodName'],
-                        data[i]['sectionPlacements'][j]['startTime'],
-                        data[i]['sectionPlacements'][j]['endTime'],
-                        data[i]['sectionPlacements'][j]['periodScheduleName']
-                    ));
-                }
-            }
-        }
-
-        // Add brunch, lunch, and misc to the schedule based on today's period schedule name
-        if (brunchSchedule[todayPeriodScheduleName]) {
-            courses.push(brunchSchedule[todayPeriodScheduleName]);
-        }
-        if (lunchSchedule[todayPeriodScheduleName]) {
-            courses.push(lunchSchedule[todayPeriodScheduleName]);
-        }
-
-        if (RallySchedule[todayPeriodScheduleName]) {
-            courses.push(RallySchedule[todayPeriodScheduleName]);
-        }
-
-        return courses;
-
-
-    } catch (error) {
-        console.error("Error fetching schedule:", error);
-        return "Error fetching schedule";
-    }
-}
-
-
-    public async getIDNumber() {
-      try {
-          const response = await fetch(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, {
-            method: 'GET',
-          });
-
-          let data = await response.json();
-          let IDNumber =  data[0]['studentNumber'];
-          return IDNumber;
-
-        } catch (err) {
-          return Promise.reject(err);
-        }
-    }
-
-    public async getStudentInfo() {
-      try {
-        
-          const response = await fetch(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, {
-            method: 'GET',
-            credentials: 'include'
-          });
-
-          let data = await response.json();
-          console.log('data');
-          console.log(data);
-          let studentID = data[0]['studentNumber'] ?? '';
-          if (studentID == '') {
-            return "No ID";
-          }
-          let personID =  data[0]['personID'] ?? '';
-          let profilePicture = await this.getProfilePicture(personID) ?? ''
-          let firstName = data[0]['firstName'];
-          let lastName = data[0]['lastName'];
-          let grade = data[0]['enrollments'][0]['grade'] ?? '';
-          let student = new Student(firstName, lastName, grade, studentID, profilePicture);
-          return student;
-
-        } catch (err) {
-          console.log('error');
-          return Promise.reject(err);
+    course.gradingTasks.forEach((task: any) => {
+      if (task.score) {
+        hasGrades = true;
       }
-    }
+      gradesDict[courseName].push({
+        taskName: task.taskName,
+        score: task.score,
+      });
+    });
+  });
 
-    public async getProfilePicture(personID: string) {
-      try {
-          const response = await fetch(`https://fuhsd.infinitecampus.org/campus/personPicture.jsp?personID=${personID}&alt=teacherApp&img=large`, {
-            method: 'GET',
-          });
-          let blob = await response.blob();
-          const fileReaderInstance = new FileReader();
+  return hasGrades ? gradesDict : "No grades";
+};
 
-          return new Promise((resolve, reject) => {
-              // Start reading the blob as a data URL
-              fileReaderInstance.readAsDataURL(blob);
-  
-              // On successful load, resolve the promise with the base64 data
-              fileReaderInstance.onload = () => {
-                  let base64data = fileReaderInstance.result as string;
-                  resolve(base64data);
-              };
-  
-              // On error, reject the promise
-              fileReaderInstance.onerror = (error) => {
-                  reject(error);
-              };
-            });
-          
-        } catch (err) {
-          console.log('error');
-          return Promise.reject(err);
+// Fetch schedule
+const isDateInRange = (start: string, end: string, current: string) => {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  const currentDate = new Date(current);
+  return currentDate >= startDate && currentDate <= endDate;
+};
+
+export const useSchedule = async (
+  formattedDate: string,
+  rosterData: any[],
+  dayData: any[]
+) => {
+  await useLogin();
+  let courses = new Array<Course>();
+  const todayPeriodScheduleID = dayData[0]?.periodScheduleID;
+  let todayPeriodScheduleName = null
+  const isSchoolDay: boolean = dayData[0]?.isSchoolDay;
+  let termName = null;
+  console.log("isSchoolDay", isSchoolDay);
+
+  // Process other classes
+  for (let i = 0; i < rosterData.length; i++) {
+    for (let j = 0; j < rosterData[i]['sectionPlacements'].length; j++) {
+        let periodScheduleID = rosterData[i]['sectionPlacements'][j]['periodScheduleID'];
+        let term = rosterData[i]['sectionPlacements'][j]['termName'];
+        termName = term;  
+        let startTerm = rosterData[i]['sectionPlacements'][j]['term']['startDate'];
+        let endTerm = rosterData[i]['sectionPlacements'][j]['term']['endDate'];
+        let isInTermRange = isDateInRange(startTerm, endTerm, formattedDate);
+
+        // COMPARE END DATES TO CURRENT DATE TO DETERMINE THE CURRENT TERM
+        if (periodScheduleID === todayPeriodScheduleID && isInTermRange) {
+            todayPeriodScheduleName = rosterData[i]['sectionPlacements'][j]['periodScheduleName'];
+            courses.push(new Course(
+              rosterData[i]['courseName'],
+              rosterData[i]['sectionPlacements'][j]['teacherDisplay'],
+              rosterData[i]['roomName'],
+              rosterData[i]['sectionPlacements'][j]['periodName'],
+              rosterData[i]['sectionPlacements'][j]['startTime'],
+              rosterData[i]['sectionPlacements'][j]['endTime'],
+              rosterData[i]['sectionPlacements'][j]['periodScheduleName']
+            ));
         }
     }
+  }
 
-    public async getEntireSchedule() {
-      const response = await fetch("https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_crossSite=true", {
-        "headers": {
-            "Accept": "application/json"
-        },
-        "method": "GET",
-      })
-      let data = await response.json()
-      let classes: Course[] = []
-      for (let course in data) {
-        classes.push(new Course(data[course]['courseName'], data[course]["teacherDisplay"], data[course]["roomName"], data[course]["sectionPlacements"][0]["periodName"], null, null,  data[course]["sectionPlacements"][0]['periodScheduleName']))
-      }
-      return classes
+  // Add brunch, lunch, and misc to the schedule based on today's period schedule name
+  if (brunchSchedule[todayPeriodScheduleName]) {
+      courses.push(brunchSchedule[todayPeriodScheduleName]);
+  }
+  if (lunchSchedule[todayPeriodScheduleName]) {
+      courses.push(lunchSchedule[todayPeriodScheduleName]);
+  }
 
-    }
+  if (RallySchedule[todayPeriodScheduleName]) {
+      courses.push(RallySchedule[todayPeriodScheduleName]);
+  }
 
-}
 
+
+  return {
+    data: isSchoolDay == true ? (courses.length > 0 ? courses : 'No courses') : 'No school today',
+    loading: false,
+    error: null,
+    term: termName,
+  };
+};
+
+// Fetch student info
+export const useStudentInfo = (data) => {
+
+  const studentData = data[0];
+  console.log('studentData', studentData);
+  const firstName = studentData?.firstName || undefined;
+  const lastName = studentData?.lastName || undefined;
+  const grade = studentData?.enrollments[0]?.grade || undefined;
+  const studentID = studentData?.studentNumber || undefined;
+
+  const student = new Student(firstName, lastName, grade, studentID);
+
+  return { student, loading: false, error: null };
+};
+
+// Fetch entire schedule
+export const useEntireSchedule = (data: any[]) => {
+  const classes = data.map((course: any) => {
+
+    const courseName = course.courseName || undefined;
+    const teacher = course.teacherDisplay || undefined;
+    const room = course.roomName || undefined;
+    const period = course.sectionPlacements?.[0]?.periodName || undefined;
+    const startTime = course.sectionPlacements?.[0]?.startTime || '00:00';
+    const endTime = course.sectionPlacements?.[0]?.endTime || '00:00';
+    const scheduleName = course.sectionPlacements?.[0]?.periodScheduleName || undefined;
+
+    return new Course(courseName, teacher, room, period, startTime, endTime, scheduleName);
+  });
+
+  return classes; 
+};

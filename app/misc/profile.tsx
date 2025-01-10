@@ -1,14 +1,12 @@
 import React from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator, Linking, Dimensions, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator, Linking, Dimensions, ScrollView, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import getUserMe from "@/hooks/Users/Users";
 import User from "@/hooks/Users/UserModal";
-import AutoHeightImage from "react-native-auto-height-image";
 import { Ionicons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SignOut from "@/hooks/ServerAuth/SignOut";
-import Alert from "@/components/Alert";
 import FilledButton from "@/components/FilledButton";
 import tw from "twrnc";
 
@@ -90,10 +88,9 @@ export default function ProfileScreen({ navigation, setLoggedIn }) {
                 <Ionicons name="person-circle-outline" size={50} />
               </View>
             ) : (
-              <AutoHeightImage
+              <Image
                 source={{ uri: me?.getPictureUrl() ?? "" }}
-                width={50}
-                style={{ borderRadius: 50, marginRight: 10 }}
+                style={{ width: 40, height: 40, borderRadius: 50, marginRight: 10 }}
               />
             )}
             <View>

@@ -12,6 +12,8 @@ import * as Notifications from 'expo-notifications';
 import UpdateExpoPushToken from '@/hooks/ServerAuth/UpdateExpoPushToken';
 import Constants from 'expo-constants';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+import useSWR from 'swr';
+import { useEntireSchedule, useSchedule, useStudentInfo } from '@/hooks/InfiniteCampus/InfiniteCampus';
 
 export default function ScheduleScreen({ navigation }) {
   const [uniqueCourses, setUniqueCourses] = useState([]);
@@ -23,6 +25,40 @@ export default function ScheduleScreen({ navigation }) {
   const {width, height } = Dimensions.get('window');
   const [coursesReleased, setCoursesReleased] = useState(true);
   const [rerenderClock, setRerenderClock] = useState(0);
+  const [termName, setTermName] = useState("");
+
+  const date = new Date();
+  const formattedDate =  date.toLocaleDateString('en-CA'); 
+  const fetcher = async (url: string, options: RequestInit = {}) => {
+    const res = await fetch(url, options);
+    if (!res.ok) {
+      throw new Error(`Error fetching data: ${res.statusText}`);
+    }
+    return res.json();
+  };
+
+  const { data: rosterData, error: rosterError } = useSWR(
+    `https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_date=${formattedDate}`,
+    fetcher
+  );
+  const calendarID = rosterData?.[0]?.calendarID;
+
+  const { data: dayData, error: dayError } = useSWR(
+    calendarID
+      ? `https://fuhsd.infinitecampus.org/campus/resources/calendar/instructionalDay?calendarID=${calendarID}&date=${formattedDate}`
+      : null,
+    fetcher
+  );
+
+  const { data: entireSchedule, error } = useSWR(
+    "https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_crossSite=true",
+    fetcher
+  );
+
+  const { data: studentInfo, studentError } = useSWR(
+    "https://fuhsd.infinitecampus.org/campus/api/portal/students",
+    fetcher
+);
 
   const fetchData = async () => {
     const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
@@ -38,9 +74,7 @@ export default function ScheduleScreen({ navigation }) {
 
     let gradYear = await AsyncStorage.getItem('gradYear');
     if (gradYear === null) {
-      let user = await makeUser();
-      user.login();
-      let student = await user.getStudentInfo();
+      let student = await useStudentInfo(studentInfo).student;
       if (student !== "No ID") {
         await AsyncStorage.setItem('gradYear', student.getGrade());
         let year = getGraduationYear(Number(student.getGrade()));
@@ -55,10 +89,8 @@ export default function ScheduleScreen({ navigation }) {
       }
     }
 
-    try {
-      let user = await makeUser();
-      let login = await user.login();
-      let courses = await getCourses(user);
+      let courses = await getCourses();
+      console.log(courses);
       setUniqueCourses(courses);
 
       let newClassTimes = { classes: [] };
@@ -71,25 +103,22 @@ export default function ScheduleScreen({ navigation }) {
       }
       setClassTimes(newClassTimes);
       setLoading(false);
-
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setLoading(false);
-    }
   };
 
-  const getCourses = async (user) => {
+  const getCourses = async () => {
     try {
-      const date = new Date();
-      const formattedDate = date.toLocaleDateString('en-CA'); // 'en-CA' format is 'YYYY-MM-DD'
-      console.log(formattedDate);      
-      let courses = await user.getSchedule(formattedDate);
+    
+      let scheduleData = await useSchedule(formattedDate, rosterData, dayData);
+      let courses = scheduleData.data;
+      const termData = await useSchedule(formattedDate, rosterData, dayData);
+      setTermName(scheduleData.term);
+      console.log(courses);
       if (courses === "No courses") {
         setCoursesReleased(false);
         return [];
       }
       if (courses === "No school today") {
-        let allClasses = await user.getEntireSchedule();
+        let allClasses = useEntireSchedule(entireSchedule);
         setNoSchoolToday(true);
         let filteredCourses = allClasses.filter((course: Course) => {
           return course.getName() !== "FHS Tutorial" && course.getName() !== "Advisory";
@@ -101,6 +130,8 @@ export default function ScheduleScreen({ navigation }) {
         });
         return filteredCourses;
       }
+      setNoSchoolToday(false);
+      setCoursesReleased(true);
 
       let uniqueCourses = [];
       let courseMap = {};
@@ -117,7 +148,7 @@ export default function ScheduleScreen({ navigation }) {
 
       //filter out PE Athletics as it is not a class
       uniqueCourses = uniqueCourses.filter((course) => {
-        return course.getName() !== "PE Athletics";
+        return course.getName() !== "PE Athletics" && course.getName()?.includes("Team") === false;
       });
 
       uniqueCourses.sort((a, b) => {
@@ -142,6 +173,8 @@ export default function ScheduleScreen({ navigation }) {
   );
 
   useEffect(() => { 
+    console.log("roster", rosterData)
+    console.log("dayData", dayData)
     const interval = setInterval(() => {
       setRerenderClock((prev) => prev + 1);
       fetchData();
@@ -170,7 +203,7 @@ export default function ScheduleScreen({ navigation }) {
         </View>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ fontSize: 20, textAlign: 'center' }}>Courses have not been released yet!</Text>
-          <Text style={{ fontSize: 20, textAlign: 'center' }}>Check back after Firebird Fiesta</Text>
+          <Text style={{ fontSize: 20, textAlign: 'center' }}>Check back after {termName == "T1" ? "Firebird Fiesta" : "Break"}</Text>
         </View>
       </SafeAreaView>
     );

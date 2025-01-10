@@ -17,8 +17,7 @@ import PostDetailView from './misc/PostDetailView';
 import ProfileScreen from './misc/profile';
 import AddClubScreen from './misc/AddClub';
 import ClubDetails from './misc/ClubDetails';
-import makeUser from '@/hooks/InfiniteCampus/MakeUser';
-import getGraduationYear from '@/constants/getGradYear';
+import { SWRConfig } from 'swr';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -34,6 +33,8 @@ export default function RootLayout() {
   const notificationListener = React.useRef<Notifications.Subscription>();
   const responseListener = React.useRef<Notifications.Subscription>();
   const Stack = createStackNavigator();
+
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -164,6 +165,7 @@ export default function RootLayout() {
   }
 
   return (
+    <SWRConfig value={{ fetcher }}>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
@@ -201,5 +203,6 @@ export default function RootLayout() {
         )}
 
       </Stack.Navigator>
+    </SWRConfig>
   );
 }

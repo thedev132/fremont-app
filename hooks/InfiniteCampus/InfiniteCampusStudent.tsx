@@ -3,14 +3,12 @@ export default class Student {
     private lastName: string | undefined;
     private grade: string | undefined;
     private studentID: string | undefined;
-    private profilePicture: string | undefined;
 
-    constructor(firstName: string, lastName: string, grade: string, studentID: string, profilePicture: string) {      
+    constructor(firstName: string, lastName: string, grade: string, studentID: string) {      
         this.firstName = firstName;
         this.lastName = lastName;
         this.grade = grade;
         this.studentID = studentID;
-        this.profilePicture = profilePicture;
     }
 
     public getFirstName() {
@@ -27,10 +25,6 @@ export default class Student {
 
     public getStudentID() {
         return this.studentID;
-    }
-
-    public getProfilePicture() {
-        return this.profilePicture;
     }
 
     public getFullName() {
