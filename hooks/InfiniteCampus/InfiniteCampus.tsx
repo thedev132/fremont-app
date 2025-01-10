@@ -15,29 +15,25 @@ const fetcher = async (url: string, options: RequestInit = {}) => {
 // Clear cookies and perform login
 export const useLogin = async () => {
   const { email, password } = await makeUser();
-  const login = async () => {
-    await CookieManager.clearAll();
-    const response = await fetch("https://fuhsd.infinitecampus.org/campus/verify.jsp", {
-      headers: {
-        accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        "content-type": "application/x-www-form-urlencoded",
-      },
-      referrer: "https://fuhsd.infinitecampus.org/campus/portal/students/fremont.jsp?status=logoff",
-      body: `username=${email}&password=${password}&portalUrl=portal%2Fstudents%2Ffremont.jsp%3F%26rID%3D0.09995412410637872&appName=fremont&url=nav-wrapper&lang=en&portalLoginPage=students`,
-      method: "POST",
-      credentials: "include",
-    });
+  await CookieManager.clearAll();
+  const response = await fetch("https://fuhsd.infinitecampus.org/campus/verify.jsp", {
+    headers: {
+      accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "content-type": "application/x-www-form-urlencoded",
+    },
+    referrer: "https://fuhsd.infinitecampus.org/campus/portal/students/fremont.jsp?status=logoff",
+    body: `username=${email}&password=${password}&portalUrl=portal%2Fstudents%2Ffremont.jsp%3F%26rID%3D0.09995412410637872&appName=fremont&url=nav-wrapper&lang=en&portalLoginPage=students`,
+    method: "POST",
+    credentials: "include",
+  });
 
-    const checkLoggedIn = await fetch(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, {
-      method: "GET",
-      credentials: "include",
-    });
+  const checkLoggedIn = await fetch(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, {
+    method: "GET",
+    credentials: "include",
+  });
 
-    return checkLoggedIn.ok ? "success" : "password";
-  };
+  return checkLoggedIn.ok ? "success" : "password";
 
-  return login;
-  login();
 };
 
 // Fetch grades
@@ -77,7 +73,7 @@ export const useSchedule = async (
   rosterData: any[],
   dayData: any[]
 ) => {
-  await useLogin();
+  await useLogin()
   let courses = new Array<Course>();
   const todayPeriodScheduleID = dayData[0]?.periodScheduleID;
   let todayPeriodScheduleName = null
@@ -134,8 +130,9 @@ export const useSchedule = async (
 };
 
 // Fetch student info
-export const useStudentInfo = (data) => {
+export const useStudentInfo = async (data) => {
 
+  await useLogin();
   const studentData = data[0];
   console.log('studentData', studentData);
   const firstName = studentData?.firstName || undefined;

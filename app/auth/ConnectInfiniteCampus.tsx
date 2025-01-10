@@ -4,6 +4,7 @@ import { Text, View, TouchableOpacity } from 'react-native';
 import { Button, TextInput } from 'react-native-paper';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import makeUser from '@/hooks/InfiniteCampus/MakeUser';
+import { useLogin } from '@/hooks/InfiniteCampus/InfiniteCampus';
 
 export default function ConnectIFScreen({loggedIn, setLoggedIn}) {
     const [email, setEmail] = useState('');
@@ -15,9 +16,8 @@ export default function ConnectIFScreen({loggedIn, setLoggedIn}) {
             // Store username and encrypted password
             await AsyncStorage.setItem('IFEmail', email);
             await EncryptedStorage.setItem('IFPassword', password);
-            await AsyncStorage.setItem('loggedIn', 'true');
-            let user = await makeUser();
-            let result = await user.login();
+            let result = await useLogin();
+            console.log(result)
             if (result == "password") {
                 alert("invalid password")
                 return
@@ -27,6 +27,7 @@ export default function ConnectIFScreen({loggedIn, setLoggedIn}) {
                 return
             }
             else if (result == "success") {
+                await AsyncStorage.setItem('loggedIn', 'true');
                 setLoggedIn(true);
             }
             else {

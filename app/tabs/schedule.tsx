@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Course from '@/hooks/InfiniteCampus/InfiniteCampusCourse';
 import ClassCountdown from '@/components/CountDownTimer';
@@ -37,25 +37,25 @@ export default function ScheduleScreen({ navigation }) {
     return res.json();
   };
 
-  const { data: rosterData, error: rosterError } = useSWR(
+  const { data: rosterData, mutate: reloadRoster, error: rosterError } = useSWR(
     `https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_date=${formattedDate}`,
     fetcher
   );
   const calendarID = rosterData?.[0]?.calendarID;
 
-  const { data: dayData, error: dayError } = useSWR(
+  const { data: dayData, mutate: reloadDay, error: dayError } = useSWR(
     calendarID
       ? `https://fuhsd.infinitecampus.org/campus/resources/calendar/instructionalDay?calendarID=${calendarID}&date=${formattedDate}`
       : null,
     fetcher
   );
 
-  const { data: entireSchedule, error } = useSWR(
+  const { data: entireSchedule, mutate: reloadEntire, error } = useSWR(
     "https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_crossSite=true",
     fetcher
   );
 
-  const { data: studentInfo, studentError } = useSWR(
+  const { data: studentInfo, mutate: reloadStudent, studentError } = useSWR(
     "https://fuhsd.infinitecampus.org/campus/api/portal/students",
     fetcher
 );
@@ -74,7 +74,8 @@ export default function ScheduleScreen({ navigation }) {
 
     let gradYear = await AsyncStorage.getItem('gradYear');
     if (gradYear === null) {
-      let student = await useStudentInfo(studentInfo).student;
+      let studentInfoData = await useStudentInfo(studentInfo);
+      let student = studentInfoData.student;
       if (student !== "No ID") {
         await AsyncStorage.setItem('gradYear', student.getGrade());
         let year = getGraduationYear(Number(student.getGrade()));
@@ -173,8 +174,10 @@ export default function ScheduleScreen({ navigation }) {
   );
 
   useEffect(() => { 
-    console.log("roster", rosterData)
-    console.log("dayData", dayData)
+    reloadRoster();
+    reloadDay();
+    reloadEntire();
+    reloadStudent();
     const interval = setInterval(() => {
       setRerenderClock((prev) => prev + 1);
       fetchData();
