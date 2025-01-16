@@ -12,8 +12,8 @@ import * as Notifications from 'expo-notifications';
 import UpdateExpoPushToken from '@/hooks/ServerAuth/UpdateExpoPushToken';
 import Constants from 'expo-constants';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
-import useSWR from 'swr';
-import { useEntireSchedule, useSchedule, useStudentInfo } from '@/hooks/InfiniteCampus/InfiniteCampus';
+import useSWR, { preload } from 'swr';
+import { useEntireSchedule, useLogin, useSchedule, useStudentInfo } from '@/hooks/InfiniteCampus/InfiniteCampus';
 
 export default function ScheduleScreen({ navigation }) {
   const [uniqueCourses, setUniqueCourses] = useState([]);
@@ -37,28 +37,54 @@ export default function ScheduleScreen({ navigation }) {
     return res.json();
   };
 
-  const { data: rosterData, mutate: reloadRoster, error: rosterError } = useSWR(
+  const { data: rosterData, mutate: reloadRoster, error: rosterError, isLoading: rosterLoad } = useSWR(
     `https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_date=${formattedDate}`,
     fetcher
   );
-  const calendarID = rosterData?.[0]?.calendarID;
+  let calendarID = rosterData?.[0]?.calendarID;
 
-  const { data: dayData, mutate: reloadDay, error: dayError } = useSWR(
+  const { data: dayData, mutate: reloadDay, error: dayError, isLoading: dayLoad} = useSWR(
     calendarID
       ? `https://fuhsd.infinitecampus.org/campus/resources/calendar/instructionalDay?calendarID=${calendarID}&date=${formattedDate}`
       : null,
     fetcher
   );
 
-  const { data: entireSchedule, mutate: reloadEntire, error } = useSWR(
+  const { data: entireSchedule, mutate: reloadEntire, error, isLoading: entireLoad } = useSWR(
     "https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_crossSite=true",
     fetcher
   );
 
-  const { data: studentInfo, mutate: reloadStudent, studentError } = useSWR(
+  const { data: studentInfo, mutate: reloadStudent, studentError, isLoading: studentLoad } = useSWR(
     "https://fuhsd.infinitecampus.org/campus/api/portal/students",
     fetcher
-);
+  );
+
+
+  useEffect(() => {
+    if (rosterData && !rosterError) {
+      reloadDay();
+      fetchData();
+    }
+  }, [rosterData, rosterError]);
+
+  useEffect(() => {
+    if (dayData && !dayError) {
+      fetchData();
+    }
+  }, [dayData, dayError]);
+
+  useEffect(() => {
+    if (entireSchedule && !error) {
+      fetchData();
+    }
+  }, [entireSchedule, error]);
+
+  useEffect(() => {
+    if (studentInfo && !studentError) {
+      fetchData();
+    }
+  }, [studentInfo, studentError]);
 
   const fetchData = async () => {
     const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
@@ -73,10 +99,8 @@ export default function ScheduleScreen({ navigation }) {
     }
 
     let gradYear = await AsyncStorage.getItem('gradYear');
-    if (gradYear === null) {
-      let studentInfoData = await useStudentInfo(studentInfo);
+      let studentInfoData = useStudentInfo(studentInfo);
       let student = studentInfoData.student;
-      if (student !== "No ID") {
         await AsyncStorage.setItem('gradYear', student.getGrade());
         let year = getGraduationYear(Number(student.getGrade()));
         await fetch("https://fremont-app.vercel.app/api/users/me/", {
@@ -87,10 +111,10 @@ export default function ScheduleScreen({ navigation }) {
           },
           body: JSON.stringify({ grad_year: year }),
         });
-      }
-    }
 
+      console.log('Fetching courses');
       let courses = await getCourses();
+      console.log('Fetching coursededefnwpfs');
       console.log(courses);
       setUniqueCourses(courses);
 
@@ -108,10 +132,10 @@ export default function ScheduleScreen({ navigation }) {
 
   const getCourses = async () => {
     try {
-    
-      let scheduleData = await useSchedule(formattedDate, rosterData, dayData);
+      let scheduleData = useSchedule(formattedDate, rosterData, dayData);
+      console.log('Fetching courses4');
       let courses = scheduleData.data;
-      const termData = await useSchedule(formattedDate, rosterData, dayData);
+      const termData = useSchedule(formattedDate, rosterData, dayData);
       setTermName(scheduleData.term);
       console.log(courses);
       if (courses === "No courses") {
@@ -173,20 +197,30 @@ export default function ScheduleScreen({ navigation }) {
     }, [])
   );
 
-  useEffect(() => { 
-    reloadRoster();
-    reloadDay();
-    reloadEntire();
-    reloadStudent();
-    const interval = setInterval(() => {
-      setRerenderClock((prev) => prev + 1);
-      fetchData();
-    }, 60000);
-    return () => clearInterval(interval);
-  }
-  , []);
+  // useEffect(() => {
+  //     // preload(`https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_date=${formattedDate}`, fetcher)
+  //     // preload(`https://fuhsd.infinitecampus.org/campus/resources/portal/roster?_expand=%7BsectionPlacements-%7Bterm%7D%7D&_crossSite=true`, fetcher)
+  //     // preload(`https://fuhsd.infinitecampus.org/campus/api/portal/students`, fetcher)
+  //     // preload(`https://fuhsd.infinitecampus.org/campus/resources/portal/grades/`, fetcher)
+  //     // const initialize = async () => {
+  //     //   await useLogin();
+  //     //   reloadRoster();
+  //     //   reloadDay();
+  //     //   reloadEntire();
+  //     //   reloadStudent();
+  //     // };
+  //     // initialize();
+  //   }, []);
 
-  if (loading) {
+    useEffect(() => {
+      fetchData();
+      reloadDay();
+      reloadEntire();
+      reloadRoster();
+      reloadStudent();
+    }, [])
+
+  if (!rosterData || !dayData || !entireSchedule || !studentInfo || loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size='large' color='#BF1B1B' />

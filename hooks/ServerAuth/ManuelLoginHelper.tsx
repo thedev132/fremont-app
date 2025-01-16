@@ -9,11 +9,17 @@ export const register = async (email: string, password: string) => {
 
             "body": `{\n    \"type\": 3,\n    \"email\": \"${email}\",\n    \"password\": \"${password}\",\n    \"re_password\": \"${password}\"\n}`,            "method": "POST",
           });
-
+        
         if (response.ok) {
             return true;
         }
-        return false;
+       let data = await response.json()
+       if (data['email']) {
+           return data['email'][0];
+       } 
+       else if (data['password']) {
+            return data['password'][0];
+        }
     } catch (err) {
         return Promise.reject(err);
     }

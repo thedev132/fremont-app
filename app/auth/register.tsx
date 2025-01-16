@@ -18,10 +18,11 @@ export default function Register({navigation}) {
         }
         // Register the user
         try {
-            let registerResponse = register(email, password);
-            if (await registerResponse == false) {
+            let registerResponse = await register(email, password);
+            console.log(registerResponse);
+            if (await registerResponse != true) {
                 // Show error message
-                alert("Error registering user");
+                alert(registerResponse);
                 return;
             }
             setLoading(true);

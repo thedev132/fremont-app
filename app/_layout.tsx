@@ -18,6 +18,7 @@ import ProfileScreen from './misc/profile';
 import AddClubScreen from './misc/AddClub';
 import ClubDetails from './misc/ClubDetails';
 import { SWRConfig } from 'swr';
+import asyncStorageProvider from './cacheProvider';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -25,6 +26,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
 
   const [loggedIn, setLoggedIn] = React.useState(false);
+  const [disable, setDisable] = React.useState(false);
   const [appIsReady, setAppIsReady] = React.useState(false);
   const [expoPushToken, setExpoPushToken] = React.useState('');
   const [notification, setNotification] = React.useState<Notifications.Notification | undefined>(
@@ -165,7 +167,7 @@ export default function RootLayout() {
   }
 
   return (
-    <SWRConfig value={{ fetcher }}>
+    <SWRConfig value={{ fetcher, provider: asyncStorageProvider }}>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,

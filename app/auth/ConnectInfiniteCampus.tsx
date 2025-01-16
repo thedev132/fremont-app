@@ -72,6 +72,10 @@ export default function ConnectIFScreen({loggedIn, setLoggedIn}) {
                         <Text className='text-white text-xl ml-3 font-bold'>Connect</Text>
                     </View>
                 </TouchableOpacity>
+                {/* <TouchableOpacity style={{marginTop: 10}} onPress={() => setLoggedIn(false)}>
+                        <Text className='text-black text-base ml-3 text-center'>Continue without connecting</Text>
+                        <Text className='text-slate-500 text-xs ml-3 text-center'>(Will disable lots of functionality)</Text>
+                </TouchableOpacity> */}
             </View>
         </View>
     );

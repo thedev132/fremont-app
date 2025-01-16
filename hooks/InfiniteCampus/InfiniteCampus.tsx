@@ -38,7 +38,6 @@ export const useLogin = async () => {
 
 // Fetch grades
 export const useGrades = async (data) => {
-  await useLogin();
   const gradesDict: Record<string, { taskName: string; score: string | null }[]> = {};
   let hasGrades = false;
 
@@ -68,18 +67,16 @@ const isDateInRange = (start: string, end: string, current: string) => {
   return currentDate >= startDate && currentDate <= endDate;
 };
 
-export const useSchedule = async (
+export const useSchedule = (
   formattedDate: string,
   rosterData: any[],
   dayData: any[]
 ) => {
-  await useLogin()
   let courses = new Array<Course>();
   const todayPeriodScheduleID = dayData[0]?.periodScheduleID;
   let todayPeriodScheduleName = null
   const isSchoolDay: boolean = dayData[0]?.isSchoolDay;
   let termName = null;
-  console.log("isSchoolDay", isSchoolDay);
 
   // Process other classes
   for (let i = 0; i < rosterData.length; i++) {
@@ -106,6 +103,7 @@ export const useSchedule = async (
         }
     }
   }
+  console.log(courses);
 
   // Add brunch, lunch, and misc to the schedule based on today's period schedule name
   if (brunchSchedule[todayPeriodScheduleName]) {
@@ -130,9 +128,7 @@ export const useSchedule = async (
 };
 
 // Fetch student info
-export const useStudentInfo = async (data) => {
-
-  await useLogin();
+export const useStudentInfo = (data) => {
   const studentData = data[0];
   console.log('studentData', studentData);
   const firstName = studentData?.firstName || undefined;

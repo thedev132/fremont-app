@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ScrollView, Text, View, Dimensions, ActivityIndicator } from 'react-native';
+import { ScrollView, Text, View, Dimensions, ActivityIndicator, SafeAreaView } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { DataTable } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
-import { useGrades } from '@/hooks/InfiniteCampus/InfiniteCampus';
+import { useGrades, useLogin } from '@/hooks/InfiniteCampus/InfiniteCampus';
 import useSWR from 'swr';
+import React from 'react';
 
 interface Grade {
   taskName: string;
@@ -20,7 +21,7 @@ export default function GradesScreen() {
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [dropdownItems, setDropdownItems] = useState<Array<{ label: string; value: string }>>([]);
   const [gradesReleased, setGradesReleased] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetcher = async (url: string, options: RequestInit = {}) => {
     const res = await fetch(url, options);
@@ -31,21 +32,19 @@ export default function GradesScreen() {
   };
 
   
-  const { data, error } = useSWR(
+  const { data, error, isLoading } = useSWR(
     "https://fuhsd.infinitecampus.org/campus/resources/portal/grades/",
     fetcher
   );
 
-  useEffect(() => {
-    setLoading(true);
-    const fetchGrades = async () => {
-      let grades = await useGrades(data);
-      console.log("grades", grades);
-      if (grades == 'No grades') {
-        setLoading(false);
-        setGradesReleased(false);
-        return;
-      }
+  const fetchGrades = async () => {
+    let grades = await useGrades(data);
+    console.log("grades", grades);
+    if (grades == 'No grades') {
+      setLoading(false);
+      setGradesReleased(false);
+      return;
+    }
 
       // Update the task names with "Semester Grade 1", "Semester Grade 2", etc.
       Object.keys(grades).forEach(subject => {
@@ -69,10 +68,18 @@ export default function GradesScreen() {
       const subjects = Object.keys(filteredGrades).map(subject => ({ label: subject, value: subject }));
       setDropdownItems(subjects);
       setSelectedSubject(subjects[0]?.value || ''); // Set the default selected subject if available
+    }
+    const initialize = async () => {
+      await useLogin();
+
     };
+
+  useEffect(() => {
+    setLoading(true);
     fetchGrades();
+    initialize();
     setLoading(false);
-  }, []);
+  }, [isLoading]);
 
   const screenWidth = Dimensions.get('window').width;
 
@@ -159,7 +166,7 @@ export default function GradesScreen() {
     return 'F';
   };
 
-  if (loading) {
+  if (loading || isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size='large' color='#BF1B1B' />
@@ -175,8 +182,9 @@ export default function GradesScreen() {
     );
   }
   return (
+    <SafeAreaView>
     <ScrollView>
-      <View style={{ flex: 1, padding: 16 }}>
+      <View style={{ flex: 1, padding: 16, marginTop: 20 }}>
         <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center' }}></Text>
         <Dropdown
           data={dropdownItems}
@@ -296,5 +304,6 @@ export default function GradesScreen() {
         )}
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
