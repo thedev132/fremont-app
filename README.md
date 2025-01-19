@@ -10,7 +10,7 @@ For any questions, please reach out to:
 
 - **Mohamad Mortada, Lead App Developer and Creator**
   - Email: [mmortada685@gmail.com](mailto:mmortada685@gmail.com)
-  - Instagram: [__mohamad_mortada__](https://www.instagram.com/__mohamad_mortada__/)
+  - Instagram: [**mohamad_mortada**](https://www.instagram.com/__mohamad_mortada__/)
   - Discord: thedev132
 
 ## Accessing the Admin Panel
@@ -47,16 +47,17 @@ Provide the details for the announcement, including:
 - **Content:** The main content of the announcement, displayed in the detailed view.
 - **Published:** Check this box to publish the announcement.
 
-
 ## Self Hosting
 
-### Step  1: Clone the code
+### Step 1: Clone the code
+
 git clone https://thedev132/fremont-app
 
 ### Step 2: Install required dependencies
-npm install 
 
-### Step 3: Install proper software 
+npm install
+
+### Step 3: Install proper software
 
 For iOS development:
 Install Xcode on MacOS

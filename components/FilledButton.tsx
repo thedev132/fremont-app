@@ -37,7 +37,12 @@ const FilledButton = ({
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={[tw`text-white text-base font-medium text-center`, textStyle]}>
+            <Text
+              style={[
+                tw`text-white text-base font-medium text-center`,
+                textStyle,
+              ]}
+            >
               {children}
             </Text>
           )}

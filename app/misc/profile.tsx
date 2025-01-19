@@ -1,5 +1,14 @@
 import React from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator, Linking, Dimensions, ScrollView, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  Linking,
+  Dimensions,
+  ScrollView,
+  Image,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import getUserMe from "@/hooks/Users/Users";
 import User from "@/hooks/Users/UserModal";
@@ -27,7 +36,7 @@ export default function ProfileScreen({ navigation, setLoggedIn }) {
           json["pictureUrl"],
           json["email"],
           json["gradYear"],
-          json["orgs"]
+          json["orgs"],
         );
         setMe(user);
         setLoading(false);
@@ -65,8 +74,7 @@ export default function ProfileScreen({ navigation, setLoggedIn }) {
             marginTop: 50,
             paddingHorizontal: 15,
           }}
-        >
-        </View>
+        ></View>
         <View>
           <View
             style={{
@@ -90,7 +98,12 @@ export default function ProfileScreen({ navigation, setLoggedIn }) {
             ) : (
               <Image
                 source={{ uri: me?.getPictureUrl() ?? "" }}
-                style={{ width: 40, height: 40, borderRadius: 50, marginRight: 10 }}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 50,
+                  marginRight: 10,
+                }}
               />
             )}
             <View>
@@ -99,7 +112,9 @@ export default function ProfileScreen({ navigation, setLoggedIn }) {
             </View>
           </View>
 
-          <TouchableOpacity onPress={() => Linking.openURL("https://fhs.fuhsd.org")}>
+          <TouchableOpacity
+            onPress={() => Linking.openURL("https://fhs.fuhsd.org")}
+          >
             <View
               style={{
                 flexDirection: "row",
@@ -124,7 +139,9 @@ export default function ProfileScreen({ navigation, setLoggedIn }) {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => Linking.openURL("https://fremontasb.org")}>
+          <TouchableOpacity
+            onPress={() => Linking.openURL("https://fremontasb.org")}
+          >
             <View
               style={{
                 flexDirection: "row",
@@ -149,7 +166,11 @@ export default function ProfileScreen({ navigation, setLoggedIn }) {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => Linking.openURL("https://www.instagram.com/firebirdfelipe/")}>
+          <TouchableOpacity
+            onPress={() =>
+              Linking.openURL("https://www.instagram.com/firebirdfelipe/")
+            }
+          >
             <View
               style={{
                 flexDirection: "row",
@@ -174,7 +195,9 @@ export default function ProfileScreen({ navigation, setLoggedIn }) {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => Linking.openURL("https://fuhsd.schoology.com")}>
+          <TouchableOpacity
+            onPress={() => Linking.openURL("https://fuhsd.schoology.com")}
+          >
             <View
               style={{
                 flexDirection: "row",
@@ -199,7 +222,9 @@ export default function ProfileScreen({ navigation, setLoggedIn }) {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => Linking.openURL("https://fuhsd.infinitecampus.org")}>
+          <TouchableOpacity
+            onPress={() => Linking.openURL("https://fuhsd.infinitecampus.org")}
+          >
             <View
               style={{
                 flexDirection: "row",
@@ -237,7 +262,9 @@ export default function ProfileScreen({ navigation, setLoggedIn }) {
                 justifyContent: "center",
               }}
             >
-              <Text style={tw`text-white text-xl ml-3 font-bold`}>Sign Out</Text>
+              <Text style={tw`text-white text-xl ml-3 font-bold`}>
+                Sign Out
+              </Text>
             </View>
           </TouchableOpacity>
         </View>

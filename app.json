@@ -3,7 +3,7 @@
     "name": "Fremont",
     "slug": "fremont-app",
     "owner": "mmortada685",
-    "version": "0.64",
+    "version": "0.67",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "fhs",
@@ -18,7 +18,8 @@
       "bundleIdentifier": "com.mmortada.fremontapp",
       "entitlements": {
         "aps-environment": "development"
-      }
+      },
+      "appleTeamId": "F3R2G55BH4"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,9 +34,7 @@
       [
         "expo-font",
         {
-          "fonts": [
-            "./assets/fonts/Inter-Bold.ttf"
-          ]
+          "fonts": ["./assets/fonts/Inter-Bold.ttf"]
         }
       ],
       [

@@ -1,0 +1,43 @@
+import { useNavigation } from "@react-navigation/native";
+import { useEffect, useCallback, useMemo } from "react";
+import * as Notifications from "expo-notifications";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React from "react";
+import { createCachedFetcher } from "@/app/cacheProvider";
+
+export const NotificationHandler = () => {
+  const navigation = useNavigation();
+  const cachedFetcher = useMemo(() => createCachedFetcher(), []);
+
+  useEffect(() => {
+    const responseListener =
+      Notifications.addNotificationResponseReceivedListener(
+        async (response) => {
+          try {
+            const data = response.notification.request.content;
+            if (!data) {
+              console.log("No post ID in notification:", data);
+              return;
+            }
+
+            requestAnimationFrame(() => {
+              navigation.navigate("misc/PostDetailView", {
+                title: data.title,
+                content: data.body,
+                date: data.data.date,
+                orgName: data.data.org,
+              });
+            });
+          } catch (error) {
+            console.error("Error handling notification:", error);
+          }
+        },
+      );
+
+    return () => {
+      Notifications.removeNotificationSubscription(responseListener);
+    };
+  }, [navigation]);
+
+  return null;
+};

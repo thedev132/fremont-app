@@ -1,11 +1,21 @@
-import { useEffect, useState } from 'react';
-import { ScrollView, Text, View, Dimensions, ActivityIndicator, SafeAreaView } from 'react-native';
-import { LineChart } from 'react-native-chart-kit';
-import { DataTable } from 'react-native-paper';
-import { Dropdown } from 'react-native-element-dropdown';
-import { useGrades, useLogin } from '@/hooks/InfiniteCampus/InfiniteCampus';
-import useSWR from 'swr';
-import React from 'react';
+import { useEffect, useState, useCallback, useMemo } from "react";
+import {
+  ScrollView,
+  Text,
+  View,
+  Dimensions,
+  ActivityIndicator,
+  SafeAreaView,
+  StyleSheet,
+} from "react-native";
+import { LineChart } from "react-native-chart-kit";
+import { DataTable } from "react-native-paper";
+import { Dropdown } from "react-native-element-dropdown";
+import { useGrades, useLogin } from "@/hooks/InfiniteCampus/InfiniteCampus";
+import useSWR from "swr";
+import React from "react";
+import { useFocusEffect } from "expo-router";
+import { createCachedFetcher } from "../cacheProvider";
 
 interface Grade {
   taskName: string;
@@ -16,294 +26,293 @@ interface Grades {
   [subject: string]: Grade[];
 }
 
+const GRADE_SCORES = {
+  "A+": 97,
+  A: 93,
+  "A-": 90,
+  "B+": 87,
+  B: 83,
+  "B-": 80,
+  "C+": 77,
+  C: 73,
+  "C-": 70,
+  "D+": 67,
+  D: 63,
+  "D-": 60,
+  F: 50,
+} as const;
+
+const VALID_GRADES = new Set(Object.keys(GRADE_SCORES));
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f5f5f5",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dropdown: {
+    marginBottom: 10,
+    marginTop: 40,
+    height: 50,
+    backgroundColor: "#fafafa",
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginHorizontal: 16,
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 100,
+    alignSelf: "center",
+    width: "100%",
+  },
+  subjectTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  chart: {
+    marginVertical: 4,
+    borderRadius: 16,
+    alignSelf: "center",
+  },
+  dataTable: {
+    marginTop: 16,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  dataTableHeader: {
+    backgroundColor: "#f5f5f5",
+  },
+});
+
 export default function GradesScreen() {
   const [grades, setGrades] = useState<Grades>({});
-  const [selectedSubject, setSelectedSubject] = useState<string>('');
-  const [dropdownItems, setDropdownItems] = useState<Array<{ label: string; value: string }>>([]);
+  const [selectedSubject, setSelectedSubject] = useState<string>("");
+  const [dropdownItems, setDropdownItems] = useState<
+    Array<{ label: string; value: string }>
+  >([]);
   const [gradesReleased, setGradesReleased] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  const fetcher = async (url: string, options: RequestInit = {}) => {
-    const res = await fetch(url, options);
-    if (!res.ok) {
-      throw new Error(`Error fetching data: ${res.statusText}`);
-    }
-    return res.json();
-  };
-
-  
-  const { data, error, isLoading } = useSWR(
-    "https://fuhsd.infinitecampus.org/campus/resources/portal/grades/",
-    fetcher
+  const screenWidth = useMemo(() => Dimensions.get("window").width, []);
+  const chartWidth = useMemo(
+    () => Math.min(screenWidth - 32, 768),
+    [screenWidth],
   );
 
-  const fetchGrades = async () => {
-    let grades = await useGrades(data);
-    console.log("grades", grades);
-    if (grades == 'No grades') {
-      setLoading(false);
+  const fetcher = useCallback(
+    async (url: string, options: RequestInit = {}) => {
+      const res = await fetch(url, options);
+      if (!res.ok) {
+        throw new Error(`Error fetching data: ${res.statusText}`);
+      }
+      return res.json();
+    },
+    [],
+  );
+
+  const cachedFetcher = useMemo(() => createCachedFetcher(), []);
+
+  const {
+    data: oldData,
+    error,
+    isLoading,
+  } = useSWR(
+    "https://fuhsd.infinitecampus.org/campus/resources/portal/grades/",
+    cachedFetcher,
+  );
+
+  const { data } = useSWR(
+    "https://fuhsd.infinitecampus.org/campus/resources/portal/grades/",
+    fetcher,
+    { fallbackData: oldData },
+  );
+
+  const processGrades = useCallback((rawGrades: any) => {
+    if (rawGrades === "No grades") {
+      return null;
+    }
+
+    return Object.fromEntries(
+      Object.entries(rawGrades)
+        .filter(([subject]) => !subject.includes("Team"))
+        .map(([subject, gradeList]: [string, Grade[]]) => {
+          let semesterGradeCount = 1;
+          const processedGrades = (gradeList as Grade[]).map((grade) => ({
+            ...grade,
+            taskName: grade.taskName.startsWith("Semester Grade")
+              ? `Semester Grade ${semesterGradeCount++}`
+              : grade.taskName,
+          }));
+          return [subject, processedGrades];
+        }),
+    );
+  }, []);
+
+  const fetchGrades = useCallback(async () => {
+    const rawGrades = await useGrades(data);
+    const processedGrades = processGrades(rawGrades);
+
+    if (!processedGrades) {
       setGradesReleased(false);
+      setLoading(false);
       return;
     }
 
-      // Update the task names with "Semester Grade 1", "Semester Grade 2", etc.
-      Object.keys(grades).forEach(subject => {
-        let semesterGradeCount = 1;
-        grades[subject] = grades[subject].map(grade => {
-          if (grade.taskName.startsWith('Semester Grade')) {
-            grade.taskName = `Semester Grade ${semesterGradeCount}`;
-            semesterGradeCount++;
-          }
-          return grade;
-        });
-      });
+    setGrades(processedGrades);
+    const subjects = Object.keys(processedGrades).map((subject) => ({
+      label: subject,
+      value: subject,
+    }));
+    setDropdownItems(subjects);
+    setSelectedSubject(subjects[0]?.value || "");
+  }, [data, processGrades]);
 
-      // Filter out subjects containing "Team"
-      const filteredGrades = Object.fromEntries(
-        Object.entries(grades).filter(([subject]) => !subject.includes('Team'))
-      );
-
-      // Set the filtered grades and dropdown items
-      setGrades(filteredGrades);
-      const subjects = Object.keys(filteredGrades).map(subject => ({ label: subject, value: subject }));
-      setDropdownItems(subjects);
-      setSelectedSubject(subjects[0]?.value || ''); // Set the default selected subject if available
-    }
-    const initialize = async () => {
-      await useLogin();
-
-    };
-
-  useEffect(() => {
-    setLoading(true);
-    fetchGrades();
-    initialize();
-    setLoading(false);
-  }, [isLoading]);
-
-  const screenWidth = Dimensions.get('window').width;
-
-  const getChartData = (subjectGrades: Grade[]) => {
-    const labels: string[] = [];
-    const data: number[] = [];
-
-    subjectGrades.forEach(grade => {
-      let score: number | null = null;
-      switch (grade.score) {
-        case 'A+':
-          score = 97;
-          break;
-        case 'A':
-          score = 93;
-          break;
-        case 'A-':
-          score = 90;
-          break;
-        case 'B+':
-          score = 87;
-          break;
-        case 'B':
-          score = 83;
-          break;
-        case 'B-':
-          score = 80;
-          break;
-        case 'C+':
-          score = 77;
-          break;
-        case 'C':
-          score = 73;
-          break;
-        case 'C-':
-          score = 70;
-          break;
-        case 'D+':
-          score = 67;
-          break;
-        case 'D':
-          score = 63;
-          break;
-        case 'D-':
-          score = 60;
-          break;
-        case 'F':
-          score = 50;
-          break;
-        default:
-          score = null; // Ignore other letters, including 'P'
-          break;
-      }
-
-      if (score !== null) {
-        labels.push(grade.taskName.replace('Progress Grade', 'P').replace('Semester Grade', 'S'));
-        data.push(score);
-      }
-    });
+  const getChartData = useCallback((subjectGrades: Grade[]) => {
+    const validGrades = subjectGrades.filter((grade) =>
+      VALID_GRADES.has(grade.score),
+    );
+    const labels = validGrades.map((grade) =>
+      grade.taskName
+        .replace("Progress Grade", "P")
+        .replace("Semester Grade", "S"),
+    );
+    const data = validGrades.map(
+      (grade) => GRADE_SCORES[grade.score as keyof typeof GRADE_SCORES] ?? 0,
+    );
 
     return {
-      labels: labels,
+      labels,
       datasets: [
-        { data: data.length ? data : [0] }, // Actual grades data
-        { data: [50], withDots: false }, // Min value
-        { data: [100], withDots: false } // Max value
+        { data: data.length ? data : [0] },
+        { data: [50], withDots: false },
+        { data: [100], withDots: false },
       ],
     };
-  };
+  }, []);
 
-  const formatYLabel = (value: number) => {
-    if (value >= 97) return 'A+';
-    if (value >= 93) return 'A';
-    if (value >= 90) return 'A-';
-    if (value >= 87) return 'B+';
-    if (value >= 83) return 'B';
-    if (value >= 80) return 'B-';
-    if (value >= 77) return 'C+';
-    if (value >= 73) return 'C';
-    if (value >= 70) return 'C-';
-    if (value >= 67) return 'D+';
-    if (value >= 63) return 'D';
-    if (value >= 60) return 'D-';
-    return 'F';
-  };
+  const formatYLabel = useCallback((value: string) => {
+    const numericValue = Number(value);
+    return (
+      Object.entries(GRADE_SCORES).find(
+        ([_, score]) => numericValue >= score,
+      )?.[0] ?? "F"
+    );
+  }, []);
+
+  useEffect(() => {
+    const initialize = async () => {
+      setLoading(true);
+      await useLogin();
+      await fetchGrades();
+      setLoading(false);
+    };
+    initialize();
+  }, [isLoading, fetchGrades]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchGrades();
+    }, [fetchGrades]),
+  );
 
   if (loading || isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size='large' color='#BF1B1B' />
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#BF1B1B" />
       </View>
     );
   }
+
   if (!gradesReleased) {
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text style={{ fontSize: 20, textAlign: 'center' }}>Your grades haven't been posted yet!</Text>
-        <Text style={{ fontSize: 20, textAlign: 'center' }}>Check back after the first grading period</Text>
+      <View style={styles.loadingContainer}>
+        <Text style={{ fontSize: 20, textAlign: "center" }}>
+          Your grades haven't been posted yet!
+        </Text>
+        <Text style={{ fontSize: 20, textAlign: "center" }}>
+          Check back after the first grading period
+        </Text>
       </View>
     );
   }
+
   return (
-    <SafeAreaView>
-    <ScrollView>
-      <View style={{ flex: 1, padding: 16, marginTop: 20 }}>
-        <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center' }}></Text>
-        <Dropdown
-          data={dropdownItems}
-          labelField="label"
-          valueField="value"
-          placeholder="Select subject"
-          value={selectedSubject}
-          onChange={(item) => {
-            setSelectedSubject(item.value);
-          }}
-          style={{
-            marginVertical: 20,
-            height: 50,
-            backgroundColor: '#fafafa',
-            borderRadius: 8,
-            padding: 12,
-            borderWidth: 1,
-            borderColor: '#ccc',
-          }}
-          placeholderStyle={{
-            fontSize: 16,
-            color: '#333',
-          }}
-          selectedTextStyle={{
-            fontSize: 16,
-            color: '#333',
-          }}
-        />
+    <SafeAreaView style={styles.container}>
+      <Dropdown
+        data={dropdownItems}
+        labelField="label"
+        valueField="value"
+        placeholder="Select subject"
+        value={selectedSubject}
+        onChange={(item) => setSelectedSubject(item.value)}
+        style={styles.dropdown}
+        placeholderStyle={styles.dropdownText}
+        selectedTextStyle={styles.dropdownText}
+      />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         {selectedSubject && grades[selectedSubject] && (
-          <View style={{ marginVertical: 20 }}>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: 'center' }}>{selectedSubject}</Text>
+          <View style={{ marginBottom: 20 }}>
+            <Text style={styles.subjectTitle}>{selectedSubject}</Text>
             <LineChart
               data={getChartData(grades[selectedSubject])}
-              width={screenWidth}
+              width={chartWidth}
               height={220}
               yAxisLabel=""
               yAxisSuffix=""
               chartConfig={{
-                backgroundColor: '#1cc910',
-                backgroundGradientFrom: '#eff3ff',
-                backgroundGradientTo: '#efefef',
+                backgroundColor: "#1cc910",
+                backgroundGradientFrom: "#eff3ff",
+                backgroundGradientTo: "#efefef",
                 decimalPlaces: 0,
                 color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                 labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                 style: { borderRadius: 16 },
                 propsForDots: {
-                  r: '6',
-                  strokeWidth: '2',
-                  stroke: '#ffa726'
-                }
+                  r: "6",
+                  strokeWidth: "2",
+                  stroke: "#ffa726",
+                },
               }}
               bezier
               formatYLabel={formatYLabel}
-              style={{ marginVertical: 8, borderRadius: 16 }}
+              style={styles.chart}
             />
-            <DataTable style={{ marginTop: 16 }}>
-              <DataTable.Header>
+            <DataTable style={styles.dataTable}>
+              <DataTable.Header style={styles.dataTableHeader}>
                 <DataTable.Title>Task</DataTable.Title>
                 <DataTable.Title numeric>Score</DataTable.Title>
               </DataTable.Header>
-              {grades[selectedSubject].map((grade) => {
-                let score: number | null = null;
-                switch (grade.score) {
-                  case 'A+':
-                    score = 97;
-                    break;
-                  case 'A':
-                    score = 93;
-                    break;
-                  case 'A-':
-                    score = 90;
-                    break;
-                  case 'B+':
-                    score = 87;
-                    break;
-                  case 'B':
-                    score = 83;
-                    break;
-                  case 'B-':
-                    score = 80;
-                    break;
-                  case 'C+':
-                    score = 77;
-                    break;
-                  case 'C':
-                    score = 73;
-                    break;
-                  case 'C-':
-                    score = 70;
-                    break;
-                  case 'D+':
-                    score = 67;
-                    break;
-                  case 'D':
-                    score = 63;
-                    break;
-                  case 'D-':
-                    score = 60;
-                    break;
-                  case 'F':
-                    score = 50;
-                    break;
-                  default:
-                    score = null; // Ignore other letters
-                    break;
-                }
-                // Only return rows with valid scores
-                return score !== null ? (
+              {grades[selectedSubject]
+                .filter((grade) => VALID_GRADES.has(grade.score))
+                .map((grade) => (
                   <DataTable.Row key={grade.taskName}>
                     <DataTable.Cell>{grade.taskName}</DataTable.Cell>
                     <DataTable.Cell numeric>{grade.score}</DataTable.Cell>
                   </DataTable.Row>
-                ) : null;
-              })}
+                ))}
             </DataTable>
           </View>
         )}
-      </View>
-    </ScrollView>
+      </ScrollView>
     </SafeAreaView>
   );
 }
