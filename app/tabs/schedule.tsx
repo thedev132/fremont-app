@@ -322,7 +322,7 @@ export default function ScheduleScreen({ navigation }) {
             marginTop: 60,
           }}
         >
-          No School Today!
+          No School Today!!!
         </Text>
         <CourseList courses={state.uniqueCourses} />
       </SafeAreaView>
