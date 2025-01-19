@@ -1,4 +1,4 @@
-# Admin Panel Instruction Manual 
+# Admin Panel Instruction Manual
 
 Detailed Document: [here](https://docs.google.com/document/d/1KL02aFw8MbDz0fC9H44jFqCn7H_pEydYMxQeoiUJFIU/edit)
 
