@@ -3,11 +3,9 @@ import { useEffect, useCallback, useMemo } from "react";
 import * as Notifications from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
-import { createCachedFetcher } from "@/app/cacheProvider";
 
 export const NotificationHandler = () => {
   const navigation = useNavigation();
-  const cachedFetcher = useMemo(() => createCachedFetcher(), []);
 
   useEffect(() => {
     const responseListener =

@@ -21,22 +21,11 @@ export default function IDCardScreen() {
   const originalBrightnessRef = useRef<number | null>(null);
   const [originalBrightness, setOriginalBrightness] = useState<number>(0);
 
-  const fetcher = async (url: string, options: RequestInit = {}) => {
-    const res = await fetch(url, options);
-    if (!res.ok) {
-      throw new Error(`Error fetching data: ${res.statusText}`);
-    }
-    return res.json();
-  };
-
   const {
     data: studentData,
     isLoading: studentLoad,
     mutate: reloadStudent,
-  } = useSWR(
-    "https://fuhsd.infinitecampus.org/campus/api/portal/students",
-    fetcher,
-  );
+  } = useSWR("https://fuhsd.infinitecampus.org/campus/api/portal/students");
 
   const personID = studentData?.[0]?.personID;
 
@@ -68,6 +57,7 @@ export default function IDCardScreen() {
 
     // Update profile picture when student data changes (including personID)
     reloadProfile(personID);
+    reloadStudent();
 
     // Process student info after data is fetched
     if (!studentLoad && studentData) {
@@ -158,7 +148,7 @@ export default function IDCardScreen() {
         <Divider width={300} marginVertical={6} />
         <Text style={{ color: "black" }}>
           Grade:{" "}
-          {studentInfo?.getGrade().charAt(0) === "0"
+          {(studentInfo?.getGrade()?.charAt(0) ?? "") === "0"
             ? studentInfo?.getGrade()?.slice(1)
             : studentInfo?.getGrade()}{" "}
           | Student

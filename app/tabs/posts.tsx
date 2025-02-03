@@ -15,7 +15,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { formatDateMMDD } from "@/constants/FormatDate";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createCachedFetcher } from "../cacheProvider";
 import useSWR from "swr";
 import { useFocusEffect } from "expo-router";
 

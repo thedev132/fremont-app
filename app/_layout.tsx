@@ -23,8 +23,8 @@ import ClubDetails from "./misc/ClubDetails";
 import useSWR, { SWRConfig } from "swr";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { lightTheme, theme } from "./theme";
-import { asyncStorageProvider, createCachedFetcher } from "./cacheProvider";
 import { NotificationHandler } from "@/components/NotificationHandler";
+import { SWRWrapper } from "@/components/SWRWrapper";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -155,15 +155,7 @@ export default function RootLayout() {
   }
 
   return (
-    <SWRConfig
-      value={{
-        fetcher,
-        revalidateOnFocus: false,
-        revalidateOnReconnect: true,
-        errorRetryCount: 3,
-        dedupingInterval: 2000,
-      }}
-    >
+    <SWRWrapper fetcher={fetcher}>
       {/* <NavigationContainer independent={true} theme={ scheme === "dark" ? theme : lightTheme}> */}
       <Stack.Navigator
         screenOptions={{
@@ -256,6 +248,6 @@ export default function RootLayout() {
       </Stack.Navigator>
       {/* </NavigationContainer> */}
       <NotificationHandler />
-    </SWRConfig>
+    </SWRWrapper>
   );
 }
