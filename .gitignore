@@ -24,3 +24,5 @@ expo-env.d.ts
 # @end expo-cli
 
 private.json
+
+*.ipa

@@ -4,8 +4,7 @@ import * as Notifications from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 
-export const NotificationHandler = () => {
-  const navigation = useNavigation();
+export const NotificationHandler = (ref) => {
 
   useEffect(() => {
     const responseListener =
@@ -19,7 +18,7 @@ export const NotificationHandler = () => {
             }
 
             requestAnimationFrame(() => {
-              navigation.navigate("misc/PostDetailView", {
+              ref.navigate("misc/PostDetailView", {
                 title: data.title,
                 content: data.body,
                 date: data.data.date,
@@ -35,7 +34,7 @@ export const NotificationHandler = () => {
     return () => {
       Notifications.removeNotificationSubscription(responseListener);
     };
-  }, [navigation]);
+  }, [ref]);
 
   return null;
 };

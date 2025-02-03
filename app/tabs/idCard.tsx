@@ -14,6 +14,7 @@ import React from "react";
 import useSWR from "swr";
 import { useFocusEffect } from "expo-router";
 import * as Brightness from "expo-brightness";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function IDCardScreen() {
   const [studentInfo, setStudentInfo] = useState<Student>();
@@ -70,35 +71,33 @@ export default function IDCardScreen() {
     }
   }, [studentLoad, studentData]);
 
-  useFocusEffect(
-    useCallback(() => {
-      const setBrightness = async () => {
-        const { status } = await Brightness.requestPermissionsAsync();
-        if (status === "granted") {
-          const current = await Brightness.getBrightnessAsync();
-          originalBrightnessRef.current = current;
-          setOriginalBrightness(current);
-          // Set to maximum brightness
-          await Brightness.setBrightnessAsync(1);
-        }
-      };
+  const isFocused = useIsFocused();
 
-      setBrightness();
-
-      return () => {
-        const restoreBrightness = async () => {
+  useEffect(() => {
+    const handleBrightness = async () => {
+      if (isFocused) {
+        try {
           const { status } = await Brightness.requestPermissionsAsync();
-          if (status === "granted") {
-            const original = originalBrightnessRef.current;
-            if (original !== null) {
-              await Brightness.setBrightnessAsync(original);
+          if (status === 'granted') {
+            if (originalBrightnessRef.current === null) {
+              originalBrightnessRef.current = await Brightness.getBrightnessAsync();
             }
+            await Brightness.setBrightnessAsync(1);
           }
-        };
-        restoreBrightness();
-      };
-    }, []),
-  );
+        } catch (error) {
+          console.error('Error setting brightness:', error);
+        }
+      } else if (originalBrightnessRef.current !== null) {
+        try {
+          await Brightness.setBrightnessAsync(originalBrightnessRef.current);
+        } catch (error) {
+          console.error('Error restoring brightness:', error);
+        }
+      }
+    };
+
+    handleBrightness();
+  }, [isFocused]);
 
   useFocusEffect(
     useCallback(() => {

@@ -21,13 +21,14 @@ import ProfileScreen from "./misc/profile";
 import AddClubScreen from "./misc/AddClub";
 import ClubDetails from "./misc/ClubDetails";
 import useSWR, { SWRConfig } from "swr";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { createNavigationContainerRef, NavigationContainer, useNavigation } from "@react-navigation/native";
 import { lightTheme, theme } from "./theme";
 import { NotificationHandler } from "@/components/NotificationHandler";
 import { SWRWrapper } from "@/components/SWRWrapper";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+export const navigationRef = createNavigationContainerRef();
 
 export default function RootLayout() {
   const [loggedIn, setLoggedIn] = React.useState(false);
@@ -41,7 +42,6 @@ export default function RootLayout() {
   const Stack = createStackNavigator();
 
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  const navigation = useNavigation();
   const scheme = useColorScheme();
 
   Notifications.setNotificationHandler({
@@ -58,7 +58,7 @@ export default function RootLayout() {
     const data = response.notification.request.content.data;
     const postId = data.data.id;
     // requestAnimationFrame(() => {
-    navigation.navigate("misc/PostDetailView", {
+    navigationRef.navigate("misc/PostDetailView", {
       id: postId,
     });
     // });
@@ -156,7 +156,7 @@ export default function RootLayout() {
 
   return (
     <SWRWrapper fetcher={fetcher}>
-      {/* <NavigationContainer independent={true} theme={ scheme === "dark" ? theme : lightTheme}> */}
+      <NavigationContainer independent={true} ref={navigationRef} >
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
@@ -246,8 +246,8 @@ export default function RootLayout() {
           </Stack.Group>
         )}
       </Stack.Navigator>
-      {/* </NavigationContainer> */}
-      <NotificationHandler />
+      </NavigationContainer>
+      <NotificationHandler ref={navigationRef} />
     </SWRWrapper>
   );
 }
